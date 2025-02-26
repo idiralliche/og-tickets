@@ -139,10 +139,10 @@ h1 {
 }
 
 /************/
-/* Epreuves */
+/* OlympicEvents */
 /************/
 
-.epreuves {
+.olympic-events {
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -157,7 +157,7 @@ h2 {
   font-size: 2rem;
 }
 
-.epreuve {
+.olympic-event {
   display: flex;
   flex-direction: column;
   border: 1px solid #ddd;
@@ -167,19 +167,19 @@ h2 {
   margin-bottom: 20px;
 }
 
-.epreuve h3,
-.epreuve .details {
+.olympic-event h3,
+.olympic-event .details {
   width: 100%;
   text-align: left;
 }
 
-.epreuve .description,
-.epreuve button {
+.olympic-event .description,
+.olympic-event button {
   width: 100%;
   margin-top: 15px;
 }
 
-.epreuve h3 {
+.olympic-event h3 {
   font-size: 1.2rem;
   color: #2e004d;
   display: flex;
@@ -187,19 +187,19 @@ h2 {
   margin: 5px 0 15px 0;
 }
 
-.epreuve h3 svg {
+.olympic-event h3 svg {
   margin-right: 10px;
   color: #d80a39;
 }
 
-.epreuve .details {
+.olympic-event .details {
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
   color: #1a1a2e;
 }
 
-.epreuve .description {
+.olympic-event .description {
   font-size: 1rem;
   margin-bottom: 10px;
 }
@@ -262,7 +262,7 @@ button:hover {
 /**********/
 
 @media (min-width: 320px) and (max-width: 768px) {
-  .epreuves {
+  .olympic-events {
     display: flex;
   }
   .footer {
@@ -298,28 +298,28 @@ button:hover {
   .mobile-nav {
     display: none !important;
   }
-  .epreuve {
+  .olympic-event {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
   }
-  .epreuve h3,
-  .epreuve .details,
-  .epreuve .description,
-  .epreuve button {
+  .olympic-event h3,
+  .olympic-event .details,
+  .olympic-event .description,
+  .olympic-event button {
     margin-top: 0;
     margin-bottom: 0;
   }
-  .epreuve h3 {
+  .olympic-event h3 {
     flex-basis: 20%;
   }
-  .epreuve .details {
+  .olympic-event .details {
     flex-basis: 15%;
   }
-  .epreuve .description {
+  .olympic-event .description {
     flex-basis: 40%;
   }
-  .epreuve button {
+  .olympic-event button {
     flex-basis: 15%;
     text-align: center;
   }

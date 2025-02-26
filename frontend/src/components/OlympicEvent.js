@@ -1,9 +1,9 @@
 import React from 'react';
 import { FaRunning } from 'react-icons/fa';
 
-const Epreuve = ({ titre, date, lieu, description }) => {
+const OlympicEvent = ({ titre, date, lieu, description }) => {
     return (
-        <div className="epreuve">
+        <div className="olympicEvent">
             <h3><FaRunning /> {titre}</h3>
             <div className="details">
                 <span><strong>Date :</strong> {date}</span>
@@ -17,4 +17,4 @@ const Epreuve = ({ titre, date, lieu, description }) => {
     );
 };
 
-export default Epreuve;
+export default OlympicEvent;
