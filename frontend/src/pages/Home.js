@@ -19,7 +19,7 @@ const Home = () => {
       <p className='home-desc'>Les Jeux Olympiques de 2024 se dérouleront à Paris.<br />
         Venez vivre des moments historiques en assistant aux plus grandes compétitions sportives mondiales.</p>
 
-      <div className="olympicEvents">
+      <div className="olympic-events">
         <h2>Les Épreuves</h2>
 
         {olympicEvents.map((olympicEvent, index) => (

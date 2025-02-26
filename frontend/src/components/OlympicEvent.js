@@ -3,7 +3,7 @@ import { FaRunning } from 'react-icons/fa';
 
 const OlympicEvent = ({ titre, date, lieu, description }) => {
     return (
-        <div className="olympicEvent">
+        <div className="olympic-event">
             <h3><FaRunning /> {titre}</h3>
             <div className="details">
                 <span><strong>Date :</strong> {date}</span>
