@@ -16,7 +16,7 @@ const Home = () => {
     <div>
       <Header />
       <h1>Bienvenue aux Jeux Olympiques 2024</h1>
-      <p className='home_desc'>Les Jeux Olympiques de 2024 se dérouleront à Paris.<br />
+      <p className='home-desc'>Les Jeux Olympiques de 2024 se dérouleront à Paris.<br />
         Venez vivre des moments historiques en assistant aux plus grandes compétitions sportives mondiales.</p>
 
       <div className="olympicEvents">
