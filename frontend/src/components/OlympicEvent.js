@@ -9,17 +9,17 @@ const OlympicEvent = ({ olympicEvent }) => {
     });
 
     return (
-        <div className="olympic-event">
-            <h3>
+        <div className="olympic-event" data-testid="olympic-event">
+            <h3 data-testid="olympic-event-heading">
                 <SportIcon sport={sport} /> {sport}
             </h3>
 
-            <div className="details">
+            <div className="details" data-testid="olympic-event-details">
                 <p><strong>Date :</strong> {formattedDate}</p>
                 <p><strong>Lieu :</strong> {location}</p>
             </div>
 
-            <div className="description">
+            <div className="description" data-testid="olympic-event-description">
                 <p><strong>{name}</strong></p>
                 <p>{description}</p>
             </div>

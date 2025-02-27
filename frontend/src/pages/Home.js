@@ -1,4 +1,3 @@
-// frontend/src/pages/Home.js
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -35,18 +34,33 @@ const Home = () => {
       <div className="olympic-events">
         <h2>Les Épreuves</h2>
 
-        {loading && <p>Loading events...</p>}
-        {error && <p className="error">{error}</p>}
-        {!loading && !error && olympicEvents.length === 0 && <p>No events available.</p>}
+        {loading && (
+          <p data-testid="loading" className="loading-text">
+            Veuillez patienter, nous recherchons les épreuves...
+          </p>
+        )}
+        {error && (
+          <p data-testid="error" className="error">
+            {error}
+          </p>
+        )}
+        {!loading && !error && olympicEvents.length === 0 && (
+          <p data-testid="no-events" className="no-events">
+            Aucune épreuve disponible.
+          </p>
+        )}
         {olympicEvents.map((olympicEvent) => (
           <OlympicEvent key={olympicEvent.pk} olympicEvent={olympicEvent} />
         ))}
 
-        <div className="view-all">
-          <Link to="/olympicEvents">
-            <button>Voir toutes les épreuves</button>
-          </Link>
-        </div>
+        {/* Render "view all events" button only if at least one event is loaded */}
+        {olympicEvents.length > 0 && (
+          <div className="view-all">
+            <Link to="/olympicEvents">
+              <button data-testid="display-all-events">Voir toutes les épreuves</button>
+            </Link>
+          </div>
+        )}
       </div>
 
       <Footer />

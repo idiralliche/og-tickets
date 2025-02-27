@@ -8,22 +8,22 @@ const SportIcon = ({ sport }) => {
     let icon;
     switch (sportLower) {
         case 'basketball':
-            icon = <FaBasketballBall />;
+            icon = <FaBasketballBall data-testid="sport-icon" data-icon-name="basketball" />;
             break;
         case 'judo':
-            icon = <GiKimono />;
+            icon = <GiKimono data-testid="sport-icon" data-icon-name="judo" />;
             break;
         case 'volleyball':
-            icon = <FaVolleyballBall />;
+            icon = <FaVolleyballBall data-testid="sport-icon" data-icon-name="volleyball" />;
             break;
         case 'football':
-            icon = <GiSoccerBall />;
+            icon = <GiSoccerBall data-testid="sport-icon" data-icon-name="football" />;
             break;
         case 'natation':
-            icon = <FaSwimmer />;
+            icon = <FaSwimmer data-testid="sport-icon" data-icon-name="natation" />;
             break;
         default:
-            icon = <FaRunning />;
+            icon = <FaRunning data-testid="sport-icon" data-icon-name="default" />;
             break;
     }
 
