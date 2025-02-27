@@ -5,31 +5,78 @@ import { Link } from 'react-router-dom';
 import OlympicEvent from '../components/OlympicEvent';
 
 const Home = () => {
-  // Données simulées 
   const olympicEvents = [
-    { titre: "Athlétisme - 100m", date: "26 juillet 2024", lieu: "Stade Olympique", description: "Série éliminatoire messieurs, groupe 1" },
-    { titre: "Athlétisme - 200m", date: "27 juillet 2024", lieu: "Stade Olympique", description: "Demi-finale dames, groupe 1" },
-    { titre: "Relais 4x100m", date: "28 juillet 2024", lieu: "Stade Olympique", description: "Finale hommes" }
+    {
+      model: "contests.contest",
+      pk: 1,
+      fields: {
+        sport: "Basketball",
+        name: "Hommes, phase de groupe",
+        description: "groupe C, Jeu 19",
+        date_time: "2024-07-31T17:15:00Z",
+        location: "Stade Pierre Mauroy"
+      }
+    },
+    {
+      model: "contests.contest",
+      pk: 2,
+      fields: {
+        sport: "Judo",
+        name: "-48 kg - fem., éliminatoire",
+        description: "1/16 finale, Concours 1",
+        date_time: "2024-07-27T10:00:00Z",
+        location: "Champ de Mars Arena"
+      }
+    },
+    {
+      model: "contests.contest",
+      pk: 3,
+      fields: {
+        sport: "Volleyball",
+        name: "Femmes, tour préliminaire",
+        description: "Poule B Match 8",
+        date_time: "2024-07-27T18:00:00Z",
+        location: "Tour Eiffel - terrain central"
+      }
+    },
+    {
+      model: "contests.contest",
+      pk: 4,
+      fields: {
+        sport: "Football",
+        name: "Hommes, éliminatoires",
+        description: "groupe B - Match 3",
+        date_time: "2024-07-24T15:00:00Z",
+        location: "Geoffroy-Guichard, St-Etienne"
+      }
+    },
+    {
+      model: "contests.contest",
+      pk: 5,
+      fields: {
+        sport: "Natation",
+        name: "400m 4 nages femmes",
+        description: "Phases éliminatoires Groupe 1. Les huit meilleurs temps se qualifient en finale.",
+        date_time: "2024-07-29T11:00:00Z",
+        location: "Paris La Defense Arena"
+      }
+    }
   ];
 
   return (
     <div>
       <Header />
       <h1>Bienvenue aux Jeux Olympiques 2024</h1>
-      <p className='home-desc'>Les Jeux Olympiques de 2024 se dérouleront à Paris.<br />
-        Venez vivre des moments historiques en assistant aux plus grandes compétitions sportives mondiales.</p>
+      <p className="home-desc">
+        Les Jeux Olympiques de 2024 se dérouleront à Paris.<br />
+        Venez vivre des moments historiques en assistant aux plus grandes compétitions sportives mondiales.
+      </p>
 
       <div className="olympic-events">
         <h2>Les Épreuves</h2>
 
-        {olympicEvents.map((olympicEvent, index) => (
-          <OlympicEvent
-            key={index}
-            titre={olympicEvent.titre}
-            date={olympicEvent.date}
-            lieu={olympicEvent.lieu}
-            description={olympicEvent.description}
-          />
+        {olympicEvents.map((olympicEvent) => (
+          <OlympicEvent key={olympicEvent.pk} olympicEvent={olympicEvent} />
         ))}
 
         <div className="view-all">
@@ -37,11 +84,10 @@ const Home = () => {
             <button>Voir toutes les épreuves</button>
           </Link>
         </div>
-
       </div>
 
       <Footer />
-    </div >
+    </div>
   );
 };
 

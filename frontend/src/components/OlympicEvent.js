@@ -1,17 +1,29 @@
 import React from 'react';
-import { FaRunning } from 'react-icons/fa';
+import SportIcon from './SportIcon';
 
-const OlympicEvent = ({ titre, date, lieu, description }) => {
+const OlympicEvent = ({ olympicEvent }) => {
+    const { sport, name, description, date_time, location } = olympicEvent.fields;
+    const formattedDate = new Date(date_time).toLocaleString('fr-FR', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+    });
+
     return (
         <div className="olympic-event">
-            <h3><FaRunning /> {titre}</h3>
+            <h3>
+                <SportIcon sport={sport} /> {sport}
+            </h3>
+
             <div className="details">
-                <span><strong>Date :</strong> {date}</span>
-                <span><strong>Lieu :</strong> {lieu}</span>
+                <p><strong>Date :</strong> {formattedDate}</p>
+                <p><strong>Lieu :</strong> {location}</p>
             </div>
+
             <div className="description">
-                {description}
+                <p><strong>{name}</strong></p>
+                <p>{description}</p>
             </div>
+
             <button>Réserver</button>
         </div>
     );
