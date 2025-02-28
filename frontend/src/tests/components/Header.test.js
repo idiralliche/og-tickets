@@ -11,8 +11,8 @@ describe('Header component', () => {
             </BrowserRouter>
         );
 
-        // Verify that the logo is rendered
-        expect(screen.getByText(/JO 2024/i)).toBeInTheDocument();
+        // Verify that the logo is rendered (based on alt attribute text content, in the logo img tag)
+        expect(screen.getByAltText(/og-tickets logo/i)).toBeInTheDocument();
 
         // Verify that navigation links from NavLinks are rendered
         const eventsLinks = screen.getAllByTestId('nav-link-events');

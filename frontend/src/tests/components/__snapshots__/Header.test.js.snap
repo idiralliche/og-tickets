@@ -8,7 +8,14 @@ exports[`Header component matches snapshot 1`] = `
     <div
       class="logo"
     >
-      🏅 JO 2024
+      <a
+        href="/"
+      >
+        <img
+          alt="og-tickets logo"
+          src="/og-tickets-w.svg"
+        />
+      </a>
     </div>
     <nav>
       <ul

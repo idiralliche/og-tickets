@@ -15,7 +15,11 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="logo"><a href='/'><img src={`${process.env.PUBLIC_URL}/og-tickets-w.svg`} alt="og-tickets logo" /></a></div>
+      <div className="logo">
+        <a href='/'>
+          <img src={`${process.env.PUBLIC_URL}/og-tickets-w.svg`} alt="og-tickets logo" />
+        </a>
+      </div>
 
       <nav>
         <NavLinks />
