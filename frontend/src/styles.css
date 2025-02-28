@@ -17,7 +17,7 @@ body {
 
 .header {
   background-color: #3b006e;
-  padding: 2rem;
+  padding: 1rem;
   color: white;
   text-align: center;
   position: relative;
@@ -27,9 +27,12 @@ body {
   align-items: center;
 }
 
-.logo {
-  font-size: 2rem;
-  padding: 30px;
+.logo a {
+  padding: 15px;
+}
+
+.logo img {
+  width: 150px;
 }
 
 /**************/
