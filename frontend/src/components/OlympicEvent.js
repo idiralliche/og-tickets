@@ -2,7 +2,7 @@ import React from 'react';
 import SportIcon from './SportIcon';
 
 const OlympicEvent = ({ olympicEvent }) => {
-    const { sport, name, description, date_time, location } = olympicEvent.fields;
+    const { sport, name, description, date_time, location } = olympicEvent;
     const formattedDate = new Date(date_time).toLocaleString('fr-FR', {
         dateStyle: 'medium',
         timeStyle: 'short'

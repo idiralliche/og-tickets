@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import events_list
+from .views import OlympicEventListAPIView
 
 urlpatterns = [
-    path('', events_list, name='events_list'),
+    path('', OlympicEventListAPIView.as_view(), name='olympic_events_list'),
 ]

@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'rest_framework',
     'olympic_events',
     'corsheaders',
 ]
@@ -63,6 +64,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ogtickets.wsgi.application"
 
+# REST Framework settings
+
+REST_FRAMEWORK = {
+    # Default settings (you can customize as needed)
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
 
 # Database
 

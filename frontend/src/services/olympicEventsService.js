@@ -19,15 +19,16 @@ export const getOlympicEvents = async () => {
 
         const data = await response.json();
 
-        // Validate each event's fields using the schema
+        // Validation des événements directement sur l'objet plat
         const validatedEvents = await Promise.all(
             data.map(async (event) => {
                 try {
-                    await olympicEventSchema.validate(event.fields, { abortEarly: false });
+                    // Validation sur l'objet event directement
+                    await olympicEventSchema.validate(event, { abortEarly: false });
                     return event;
                 } catch (validationError) {
                     console.error("Validation error for event:", event, validationError);
-                    // Return null for invalid events
+                    // Retourne null pour les événements invalides
                     return null;
                 }
             })
@@ -35,7 +36,6 @@ export const getOlympicEvents = async () => {
 
         return validatedEvents.filter(event => event !== null);
     } catch (error) {
-        // Distinguish between abort error and other errors
         if (error.name === 'AbortError') {
             throw new Error('Request timed out');
         }
