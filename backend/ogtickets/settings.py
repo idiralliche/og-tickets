@@ -1,18 +1,28 @@
-from pathlib import Path
-from decouple import config
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+# Setting environment configuration
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+ENV = os.getenv('ENV', 'dev')
+ENV_TEST_PATH = os.path.join(BASE_DIR, '.env.test')
+
+if 'test' == ENV :
+    if os.path.exists(ENV_TEST_PATH):
+        load_dotenv(ENV_TEST_PATH, override=True)
+    else: 
+        raise Exception(f"Missing .env.test file at {ENV_TEST_PATH}")
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool)
+DEBUG = bool(os.getenv('DEBUG', True))
 
 ALLOWED_HOSTS = []
 
@@ -73,17 +83,18 @@ REST_FRAMEWORK = {
     ],
 }
 
+
 # Database
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASE_NAME'),
-        'USER': config('DATABASE_USER'),
-        'PASSWORD': config('DATABASE_PASSWORD'),
-        'HOST': config('DATABASE_HOST'),
-        'PORT': config('DATABASE_PORT', cast=int),
-    }
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT':  int(os.getenv('DATABASE_PORT', 5432)),
+    },
 }
 
 
