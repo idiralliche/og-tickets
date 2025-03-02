@@ -24,15 +24,12 @@ describe('Home page', () => {
     test('displays events when loaded by showing the "view all events" button', async () => {
         const validData = [
             {
-                model: "contests.contest",
-                pk: 1,
-                fields: {
-                    sport: "Basketball",
-                    name: "Men's Group Stage",
-                    description: "Group C, Game 19",
-                    date_time: "2024-07-31T17:15:00Z",
-                    location: "Stade Pierre Mauroy"
-                }
+                "id": 1,
+                "sport": "Basketball",
+                "name": "Hommes, phase de groupe",
+                "description": "groupe C, Jeu 19",
+                "date_time": "2024-07-31T17:15:00Z",
+                "location": "Stade Pierre Mauroy"
             }
         ];
         getOlympicEvents.mockResolvedValue(validData);
@@ -70,4 +67,17 @@ describe('Home page', () => {
         const errorElement = await screen.findByTestId('error');
         expect(errorElement).toBeInTheDocument();
     });
+
+    test('displays errorn message in case of network issue', async () => {
+        getOlympicEvents.mockRejectedValue(new Error('Le serveur ne répond pas'));
+
+        render(
+            <BrowserRouter>
+                <Home />
+            </BrowserRouter>
+        );
+
+        const errorElement = await screen.findByTestId('error');
+        expect(errorElement).toHaveTextContent('Le serveur ne répond pas');
+    })
 });
