@@ -94,6 +94,9 @@ DATABASES = {
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'HOST': os.getenv('DATABASE_HOST'),
         'PORT':  int(os.getenv('DATABASE_PORT', 5432)),
+        'OPTIONS': {
+            'sslmode': 'require',  # Force SSL connection
+        },
     },
 }
 
