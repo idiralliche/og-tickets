@@ -261,6 +261,66 @@ button:hover {
 }
 
 /**********/
+/* errors */
+/**********/
+
+.error-container {
+  text-align: center;
+  background-color: #ffdddd;
+  color: #d8000c;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 10px auto;
+  width: 80%;
+}
+
+.error-message {
+  font-weight: bold;
+}
+
+.retry-button {
+  background-color: #d8000c;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.retry-button:hover {
+  background-color: #a6082a;
+}
+
+/***********/
+/* loading */
+/***********/
+
+.spinner-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.spinner {
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #ffffff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/**********/
 /* tablet */
 /**********/
 

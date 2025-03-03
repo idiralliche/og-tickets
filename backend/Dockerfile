@@ -1,18 +1,21 @@
-# Use a lightweight Python image
-FROM python:3.10-slim
-
-# Set working directory
+FROM python:3.12-slim AS base
 WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE  \
+    PYTHONUNBUFFERED 1
 
-# Copy requirements.txt and install dependencies
-COPY requirements.txt requirements.txt
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN adduser --disabled-password --gecos '' appuser \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy the rest of the application code
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+FROM base AS release
 COPY . .
 
-# Expose the port used by Django (default: 8000)
+USER appuser
+
 EXPOSE 8000
 
-# Start the Django development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "ogtickets.wsgi:application"]
