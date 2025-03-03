@@ -19,15 +19,12 @@ describe('getOlympicEvents service', () => {
     test('should fetch and return validated events', async () => {
         const validData = [
             {
-                model: "contests.contest",
-                pk: 1,
-                fields: {
-                    sport: "Basketball",
-                    name: "Men's Group Stage",
-                    description: "Group C, Game 19",
-                    date_time: "2024-07-31T17:15:00Z",
-                    location: "Stade Pierre Mauroy"
-                }
+                id: 1,
+                sport: "Basketball",
+                name: "Hommes, phase de groupe",
+                description: "groupe C, Jeu 19",
+                date_time: "2024-07-31T17:15:00Z",
+                location: "Stade Pierre Mauroy"
             }
         ];
         fetchMock.mockResponseOnce(JSON.stringify(validData));
@@ -39,43 +36,56 @@ describe('getOlympicEvents service', () => {
     test('should filter out invalid events', async () => {
         const dataWithInvalid = [
             {
-                model: "contests.contest",
-                pk: 1,
-                fields: {
-                    sport: "Basketball",
-                    name: "Men's Group Stage",
-                    description: "Group C, Game 19",
-                    date_time: "2024-07-31T17:15:00Z",
-                    location: "Stade Pierre Mauroy"
-                }
+                id: 1,
+                sport: "Basketball",
+                name: "Hommes, phase de groupe",
+                description: "groupe C, Jeu 19",
+                date_time: "2024-07-31T17:15:00Z",
+                location: "Stade Pierre Mauroy"
             },
             {
-                model: "contests.contest",
-                pk: 2,
-                fields: {
-                    sport: "", // Invalid: empty string
-                    name: "",
-                    description: "",
-                    date_time: "invalid-date",
-                    location: ""
-                }
+                id: 2,
+                sport: "", // Invalid: empty string
+                name: "",
+                description: "",
+                date_time: "invalid-date",
+                location: ""
             }
         ];
         fetchMock.mockResponseOnce(JSON.stringify(dataWithInvalid));
 
         const events = await getOlympicEvents();
         expect(events.length).toBe(1);
-        expect(events[0].pk).toBe(1);
+        expect(events[0].id).toBe(1);
     });
 
     test('should throw an error for a non-OK response', async () => {
-        // Simulate non-OK response (e.g., 404)
         fetchMock.mockResponseOnce('Not Found', { status: 404 });
         await expect(getOlympicEvents()).rejects.toBeInstanceOf(Error);
     });
 
+    test('Returns an error for a server error (500)', async () => {
+        fetchMock.mockResponseOnce('', { status: 500 });
+        await expect(getOlympicEvents()).rejects.toBeInstanceOf(Error);
+    });
+
+    test('Returns an error for unauthorized access (401/403)', async () => {
+        fetchMock.mockResponseOnce('', { status: 403 });
+        await expect(getOlympicEvents()).rejects.toBeInstanceOf(Error);
+    });
+
+    test('Returns an error if response is not a valid array', async () => {
+        fetchMock.mockResponseOnce(JSON.stringify({ error: "Invalid data" }));
+        await expect(getOlympicEvents()).rejects.toBeInstanceOf(Error);
+    });
+
+    test('Returns an error if no valid events are found', async () => {
+        fetchMock.mockResponseOnce(JSON.stringify([]));
+
+        await expect(getOlympicEvents()).rejects.toBeInstanceOf(Error);
+    });
+
     test('should throw a timeout error if the request takes too long', async () => {
-        // Simulate a timeout by aborting the fetch
         fetchMock.mockAbortOnce();
         await expect(getOlympicEvents()).rejects.toBeInstanceOf(Error);
     });

@@ -35,14 +35,18 @@ const Home = () => {
         <h2>Les Épreuves</h2>
 
         {loading && (
-          <p data-testid="loading" className="loading-text">
-            Veuillez patienter, nous recherchons les épreuves...
-          </p>
+          <div className="spinner-container" data-testid="loading">
+            <div className="spinner"></div>
+            <p className="loading-text">Chargement des épreuves...</p>
+          </div>
         )}
         {error && (
-          <p data-testid="error" className="error">
-            {error}
-          </p>
+          <div className="error-container" data-testid="error">
+            <p className="error-message">⚠️ {error}</p>
+            <button onClick={() => window.location.reload()} className="retry-button">
+              Réessayer
+            </button>
+          </div>
         )}
         {!loading && !error && olympicEvents.length === 0 && (
           <p data-testid="no-events" className="no-events">
