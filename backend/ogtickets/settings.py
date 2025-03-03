@@ -6,16 +6,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Setting environment configuration
-load_dotenv(os.path.join(BASE_DIR, '.env'))
-
 ENV = os.getenv('ENV', 'dev')
-ENV_TEST_PATH = os.path.join(BASE_DIR, '.env.test')
 
-if 'test' == ENV :
-    if os.path.exists(ENV_TEST_PATH):
-        load_dotenv(ENV_TEST_PATH, override=True)
-    else: 
-        raise Exception(f"Missing .env.test file at {ENV_TEST_PATH}")
+if ENV != 'prod' and ENV != 'production':
+    load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+    if ENV == 'test':
+        ENV_FILEPATH = os.path.join(BASE_DIR, '.env.test')
+        # ".env.test" file is required for testing
+        if os.path.exists(ENV_FILEPATH):
+            load_dotenv(ENV_FILEPATH, override=True)
+        else: 
+            raise Exception(f"Missing .env.test file at {ENV_FILEPATH}")
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -93,12 +95,12 @@ DATABASES = {
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'HOST': os.getenv('DATABASE_HOST'),
-        'PORT':  int(os.getenv('DATABASE_PORT', 5432)),
-        'OPTIONS': {
-            'sslmode': 'require',  # Force SSL connection
-        },
+        'PORT': int(os.getenv('DATABASE_PORT', 5432)),
+        'OPTIONS': {}  # sslmode only set in production, see below
     },
 }
+if os.getenv('ENV', 'dev') in ['prod', 'production']:
+    DATABASES['default']['OPTIONS']['sslmode'] = 'require'
 
 
 # Password validation
