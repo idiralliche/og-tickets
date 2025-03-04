@@ -19,9 +19,7 @@ staticfiles/
 # misc
 venv/
 .env
-.env.dev*
-.env.test*
-.env.prod*
+.env.*
 secrets/
 
 # OS-specific files
