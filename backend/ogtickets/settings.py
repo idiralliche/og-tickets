@@ -1,5 +1,24 @@
 import os
+import sentry_sdk
 from dotenv import load_dotenv
+
+# Initialize Sentry only in production mode
+if os.getenv('ENV', 'dev') in ['prod', 'production']:
+    sentry_sdk.init(
+        dsn=os.getenv('SENTRY_DSN', ''),
+        # Add data like request headers and IP for users,
+        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+        send_default_pii=True,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for tracing.
+        traces_sample_rate=1.0,
+        _experiments={
+            # Set continuous_profiling_auto_start to True
+            # to automatically start the profiler on when
+            # possible.
+            "continuous_profiling_auto_start": True,
+        },
+    )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -8,6 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.getenv('ENV', 'dev')
 
 if ENV not in ['prod', 'production']:
+    # Development / test environment: load from .env files
     ENV_FILEPATH = os.path.join(BASE_DIR, f'.env')
     if os.path.exists(ENV_FILEPATH):
         # Load environment variables from .env file
@@ -22,7 +42,10 @@ if ENV not in ['prod', 'production']:
             load_dotenv(ENV_TEST_FILEPATH, override=True)
         else: 
             raise Exception(f"Missing .env.test file at {ENV_TEST_FILEPATH}")
-
+else:
+    # Production environment: expect secrets to be provided via environment variables
+    # No .env file is loaded
+    pass
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
@@ -85,6 +108,9 @@ REST_FRAMEWORK = {
     # Default settings (you can customize as needed)
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',  # Only return JSON responses
     ],
 }
 
