@@ -7,6 +7,9 @@ env/
 .env/
 
 .env
+.env.test*
+.env.prod*
+.env.dev*
 secrets.json
 secrets/
 
@@ -14,7 +17,9 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+staticfiles/
 
+logs/
 *.log
 
 .idea/
@@ -24,6 +29,8 @@ __pycache__/
 *.swp
 
 tests/
+test.*
+tests.*
 /coverage
 
 readme.md

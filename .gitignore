@@ -13,6 +13,9 @@ dist/
 # Ignore Python cache directories
 *pycache*/
 
+# Ignore Python compiled files
+staticfiles/
+
 # misc
 venv/
 .env

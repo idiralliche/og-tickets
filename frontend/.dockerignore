@@ -1,14 +1,18 @@
 .git
 .gitignore
 
-node_modules
-build
-dist
-
-*.log
-logs/
+env/
+.env/
 
 .env
+.env.test*
+.env.prod*
+.env.dev*
+secrets.json
+secrets/
+
+logs/
+*.log
 
 .idea/
 .vscode/
@@ -17,4 +21,12 @@ logs/
 *.swp
 
 tests/
+test/
+test.*
+tests.*
+*.test.*
+*.spec.*
 /coverage
+
+readme.md
+node_modules/
