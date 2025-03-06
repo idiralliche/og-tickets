@@ -1,0 +1,15 @@
+services:
+  backend:
+    image: tixidest/ogtickets-backend:latest
+    ports:
+      - "8000:8000"
+    environment:
+      ENV: prod
+    volumes:
+      - ./secrets/secret_key.txt:/run/secrets/secret_key:ro
+      - ./secrets/db_user.txt:/run/secrets/db_user:ro
+      - ./secrets/db_password.txt:/run/secrets/db_password:ro
+      - ./secrets/db_name.txt:/run/secrets/db_name:ro
+      - ./secrets/db_host.txt:/run/secrets/db_host:ro
+      - ./secrets/allowed_hosts.txt:/run/secrets/allowed_hosts:ro
+      - ./secrets/sentry_dsn.txt:/run/secrets/sentry_dsn:ro

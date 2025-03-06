@@ -31,5 +31,5 @@ test.*
 tests.*
 /coverage
 
-readme.md
+*.md
 node_modules/
