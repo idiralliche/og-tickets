@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 # Stage 1: Build stage
 FROM python:3.12-slim AS builder
 WORKDIR /app
@@ -9,6 +11,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency file and install packages
@@ -21,11 +24,14 @@ COPY . .
 # Set production environment variables for the build stage
 # This avoids loading .env file and allows running collectstatic
 ENV ENV=prod
-ENV SECRET_KEY=dummysecretkey
 ENV DEBUG=False
 
 # Run collectstatic to gather static files (ensure production settings are set)
-RUN python manage.py collectstatic --noinput
+# collectstatic requires SECRET_KEY to be set
+# use a secret file mounted as a volume for SECRET_KEY
+RUN --mount=type=secret,id=secret_key,dst=/run/secrets/secret_key \
+    SECRET_KEY=$(cat /run/secrets/secret_key) \
+    && python manage.py collectstatic --noinput
 
 # Stage 2: Final image
 FROM python:3.12-slim
@@ -34,12 +40,14 @@ WORKDIR /app
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser
 
-# Copy installed packages from builder stage
+# Copy installed packages and project code from builder stage
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copy the application code (only necessary files)
 COPY --from=builder /app /app
+
+# Copy entrypoint script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Switch to non-root user
 USER appuser
@@ -48,4 +56,4 @@ USER appuser
 EXPOSE 8000
 
 # Start the application using gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "ogtickets.wsgi:application"]
+CMD ["sh", "/start.sh"]
