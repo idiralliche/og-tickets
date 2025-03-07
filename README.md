@@ -4,6 +4,8 @@ Cette application a été développée dans un but pédagogique (Développement 
 
 **og-tickets** est une application web de réservation et de gestion d'e-tickets pour les Jeux Olympiques de 2024. L'application remplace les tickets physiques par des e-tickets sécurisés afin de faciliter les réservations et limiter les risques de fraude.
 
+Accédez à l'application déployée sur [https://og-tickets.vercel.app/](https://og-tickets.vercel.app/)
+
 ## Table des matières
 
 - [Fonctionnalités](#fonctionnalités)
