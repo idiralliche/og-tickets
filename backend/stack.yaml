@@ -42,7 +42,7 @@ services:
 
 secrets:
   secret_key:
-    file: secrets/django_secret_key.txt
+    file: secrets/secret_key.txt
   DB_USER:
     file: secrets/db_user.txt
   DB_PASSWORD:
