@@ -42,16 +42,16 @@ services:
 
 secrets:
   secret_key:
-    external: true
-  db_password:
-    external: true
-  db_user:
-    external: true
-  db_name:
-    external: true
-  db_host:
-    external: true
-  allowed_hosts:
-    external: true
-  sentry_dsn:
-    external: true
+    file: secrets/django_secret_key.txt
+  DB_USER:
+    file: secrets/db_user.txt
+  DB_PASSWORD:
+    file: secrets/db_password.txt
+  DB_NAME:
+    file: secrets/db_name.txt
+  DB_HOST:
+    file: secrets/db_host.txt
+  ALLOWED_HOSTS:
+    file: secrets/allowed_hosts.txt
+  SENTRY_DSN:
+    file: secrets/sentry_dsn.txt
