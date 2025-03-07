@@ -43,15 +43,15 @@ services:
 secrets:
   secret_key:
     file: secrets/secret_key.txt
-  DB_USER:
+  db_user:
     file: secrets/db_user.txt
-  DB_PASSWORD:
+  db_password:
     file: secrets/db_password.txt
-  DB_NAME:
+  db_name:
     file: secrets/db_name.txt
-  DB_HOST:
+  db_host:
     file: secrets/db_host.txt
-  ALLOWED_HOSTS:
+  allowed_hosts:
     file: secrets/allowed_hosts.txt
-  SENTRY_DSN:
+  sentry_dsn:
     file: secrets/sentry_dsn.txt
