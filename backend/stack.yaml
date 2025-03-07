@@ -10,19 +10,12 @@ services:
       ENV: prod
     secrets:
       - source: secret_key
-        target: SECRET_KEY
       - source: db_password
-        target: DATABASE_PASSWORD
       - source: sentry_dsn
-        target: SENTRY_DSN
       - source: db_user
-        target: DATABASE_USER
       - source: db_name
-        target: DATABASE_NAME
       - source: db_host
-        target: DATABASE_HOST
       - source: allowed_hosts
-        target: ALLOWED_HOSTS
     deploy:
       replicas: 1
       restart_policy:
@@ -42,16 +35,16 @@ services:
 
 secrets:
   secret_key:
-    file: secrets/django_secret_key.txt
-  DB_USER:
+    file: secrets/secret_key.txt
+  db_user:
     file: secrets/db_user.txt
-  DB_PASSWORD:
+  db_password:
     file: secrets/db_password.txt
-  DB_NAME:
+  db_name:
     file: secrets/db_name.txt
-  DB_HOST:
+  db_host:
     file: secrets/db_host.txt
-  ALLOWED_HOSTS:
+  allowed_hosts:
     file: secrets/allowed_hosts.txt
-  SENTRY_DSN:
+  sentry_dsn:
     file: secrets/sentry_dsn.txt
