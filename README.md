@@ -86,7 +86,7 @@ cd backend
 
 Créez un dossier `secrets/`dans le répertoire backend (ajoutez-le à `.gitignore` pour ne pas versionner ces fichiers). Dans ce dossier, créez les fichiers suivants avec vos valeurs sensibles :
 
-- secrets/django_secret_key.txt
+- secrets/secret_key.txt
 - secrets/db_user.txt
 - secrets/db_password.txt
 - secrets/db_name.txt
@@ -142,7 +142,7 @@ npm install
 Dans le fichier `.env` du frontend (ou via la configuration de votre PaaS), définissez la variable :
 
 ```env
-REACT_APP_BACKEND_BASE_URL=https://ogtickets.duckdns.org/
+REACT_APP_BACKEND_BASE_URL=https://your-hostname.org/
 
 ```
 
