@@ -10,19 +10,12 @@ services:
       ENV: prod
     secrets:
       - source: secret_key
-        target: SECRET_KEY
       - source: db_password
-        target: DATABASE_PASSWORD
       - source: sentry_dsn
-        target: SENTRY_DSN
       - source: db_user
-        target: DATABASE_USER
       - source: db_name
-        target: DATABASE_NAME
       - source: db_host
-        target: DATABASE_HOST
       - source: allowed_hosts
-        target: ALLOWED_HOSTS
     deploy:
       replicas: 1
       restart_policy:
