@@ -1,0 +1,29 @@
+[
+    {
+        "model": "offers.offer",
+        "pk": 1,
+        "fields": {
+            "name": "Solo",
+            "description": "1 ticket pour une personne",
+            "price": 50
+        }
+    },
+    {
+        "model": "offers.offer",
+        "pk": 2,
+        "fields": {
+            "name": "Duo",
+            "description": "1 ticket pour deux personnes",
+            "price": 90
+        }
+    },
+    {
+        "model": "offers.offer",
+        "pk": 3,
+        "fields": {
+            "name": "Famille",
+            "description": "1 ticket pour 4 personnes",
+            "price": 160
+        }
+    }
+]
