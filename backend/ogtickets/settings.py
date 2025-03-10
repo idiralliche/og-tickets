@@ -28,10 +28,12 @@ ENV = os.getenv('ENV', 'dev')
 
 if ENV not in ['prod', 'production']:
     # Development / test environment: load from .env files
-    ENV_FILEPATH = os.path.join(BASE_DIR, f'.env')
+    ENV_FILEPATH = os.path.join(BASE_DIR, '.env')
     if os.path.exists(ENV_FILEPATH):
+        print(ENV)
         # Load environment variables from .env file
-        load_dotenv(ENV_FILEPATH)
+        load_dotenv(ENV_FILEPATH, override=True)
+        print(ENV)
     else:
         raise Exception(f"Missing .env file at {ENV_FILEPATH}")
 
@@ -61,8 +63,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'rest_framework',
-    'olympic_events',
     'corsheaders',
+    'olympic_events',
+    'offers',
 ]
 
 MIDDLEWARE = [
