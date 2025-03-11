@@ -8,7 +8,7 @@ export const getOffers = async () => {
 
     try {
         // Construct the backend URL using environment variables
-        const backendUrl = process.env.BACKEND_BASE_URL + process.env.OFFERS_PATH;
+        const backendUrl = process.env.REACT_APP_BACKEND_BASE_URL + process.env.REACT_APP_OFFERS_PATH;
         const response = await fetch(backendUrl, {
             signal: controller.signal,
         });

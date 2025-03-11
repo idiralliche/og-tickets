@@ -7,7 +7,7 @@ export const getOlympicEvents = async () => {
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
     try {
-        const backendUrl = process.env.BACKEND_BASE_URL + process.env.OLYMPIC_EVENTS_PATH;
+        const backendUrl = process.env.REACT_APP_BACKEND_BASE_URL + process.env.REACT_APP_OLYMPIC_EVENTS_PATH;
         const response = await fetch(backendUrl, {
             signal: controller.signal
         });
