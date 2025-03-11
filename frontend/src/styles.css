@@ -141,9 +141,9 @@ h1 {
   color: #d0d0d0;
 }
 
-/************/
+/*****************/
 /* OlympicEvents */
-/************/
+/*****************/
 
 .olympic-events {
   display: flex;
@@ -243,6 +243,59 @@ button:hover {
 
 .view-all button:hover {
   background-color: #a6082a;
+}
+
+/***************/
+/* offer cards */
+/***************/
+
+.offers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  width: 90%;
+}
+
+.offers-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.offer-card {
+  border: 1px solid #ddd;
+  color: #002654;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 5px;
+  flex-basis: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.offer-card h2 {
+  color: #002654;
+}
+
+.offer-card button {
+  background-color: #a77833;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.offer-card button:hover {
+  background-color: #aa8031;
 }
 
 /**********/
@@ -360,6 +413,13 @@ button:hover {
   .burger-menu,
   .mobile-nav {
     display: none !important;
+  }
+  .offers-container {
+    flex-direction: row;
+    margin: 50px 0;
+  }
+  .offer-card {
+    flex-basis: 25%;
   }
   .olympic-event {
     display: flex;
