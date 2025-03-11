@@ -56,7 +56,7 @@ const Home = () => {
       {/* Render "view all events" button only if at least one event is loaded */}
       {olympicEvents.length > 0 && (
         <div className="view-all">
-          <Link to="/olympicEvents">
+          <Link to="/epreuves">
             <button data-testid="display-all-events">Voir toutes les épreuves</button>
           </Link>
         </div>
