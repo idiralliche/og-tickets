@@ -13,3 +13,9 @@ services:
       - ./secrets/db_host.txt:/run/secrets/db_host:ro
       - ./secrets/allowed_hosts.txt:/run/secrets/allowed_hosts:ro
       - ./secrets/sentry_dsn.txt:/run/secrets/sentry_dsn:ro
+    networks:
+      - ogtickets_nw
+
+networks:
+  ogtickets_nw:
+    external: true
