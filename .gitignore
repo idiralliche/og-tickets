@@ -35,3 +35,5 @@ yarn-error.log*
 # IDE specific
 .vscode/
 .idea/
+
+nginx/
