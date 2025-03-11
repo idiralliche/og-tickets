@@ -2,10 +2,14 @@ import os
 import sentry_sdk
 from dotenv import load_dotenv
 
+# Setting environment configuration
+ENV = os.getenv('ENV', 'dev')
+
 # Initialize Sentry only in production mode
-if os.getenv('ENV', 'dev') in ['prod', 'production']:
+SENTRY_DSN=os.getenv('SENTRY_DSN', '')
+if ENV in ['prod', 'production'] and SENTRY_DSN:
     sentry_sdk.init(
-        dsn=os.getenv('SENTRY_DSN', ''),
+        dsn=SENTRY_DSN,
         # Add data like request headers and IP for users,
         # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
         send_default_pii=True,
@@ -23,27 +27,13 @@ if os.getenv('ENV', 'dev') in ['prod', 'production']:
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Setting environment configuration
-ENV = os.getenv('ENV', 'dev')
-
-if ENV not in ['prod', 'production']:
-    # Development / test environment: load from .env files
-    ENV_FILEPATH = os.path.join(BASE_DIR, '.env')
-    if os.path.exists(ENV_FILEPATH):
-        print(ENV)
-        # Load environment variables from .env file
-        load_dotenv(ENV_FILEPATH, override=True)
-        print(ENV)
-    else:
-        raise Exception(f"Missing .env file at {ENV_FILEPATH}")
-
-    if ENV == 'test':
-        ENV_TEST_FILEPATH = os.path.join(BASE_DIR, '.env.test')
-        # ".env.test" file is required for testing
-        if os.path.exists(ENV_TEST_FILEPATH):
-            load_dotenv(ENV_TEST_FILEPATH, override=True)
-        else: 
-            raise Exception(f"Missing .env.test file at {ENV_TEST_FILEPATH}")
+if ENV == 'test':
+    ENV_TEST_FILEPATH = os.path.join(BASE_DIR, '.env.test')
+    # ".env.test" file is required for testing
+    if os.path.exists(ENV_TEST_FILEPATH):
+        load_dotenv(ENV_TEST_FILEPATH, override=True)
+    else: 
+        raise Exception(f"Missing .env.test file at {ENV_TEST_FILEPATH}")
 else:
     # Production environment: expect secrets to be provided via environment variables
     # No .env file is loaded
