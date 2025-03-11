@@ -19,6 +19,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
+    "watch:build": "chokidar 'src/**/*' -c 'npm run build'",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
@@ -41,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "chokidar-cli": "^3.0.0",
     "jest-fetch-mock": "^3.0.3"
   }
 }
