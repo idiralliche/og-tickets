@@ -3,6 +3,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('olympic_events/', include('olympic_events.urls')),
-    path('offers/', include('offers.urls')),
+    # Include all API endpoints under the "api/" prefix.
+    path('api/', include('ogtickets.api_urls')),
 ]
