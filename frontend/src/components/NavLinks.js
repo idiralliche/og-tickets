@@ -6,7 +6,7 @@ const NavLinks = ({ onLinkClick }) => {
   return (
     <>
       <ul className="nav-links">
-        <li><Link data-testid="nav-link-events" to="/olympicEvents" onClick={onLinkClick}>Les épreuves</Link></li>
+        <li><Link data-testid="nav-link-events" to="/epreuves" onClick={onLinkClick}>Les épreuves</Link></li>
         <li><Link data-testid="nav-link-offers" to="/offres" onClick={onLinkClick}>Nos offres</Link></li>
       </ul>
       <ul className="nav-links">
