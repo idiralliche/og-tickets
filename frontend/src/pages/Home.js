@@ -40,7 +40,7 @@ const Home = () => {
           <p className='error-message'>⚠️ {error}</p>
           <button
             onClick={() => window.location.reload()}
-            className='retry-button'
+            className='button retry- button'
           >
             Réessayer
           </button>
@@ -59,10 +59,12 @@ const Home = () => {
       {/* Render "view all events" button only if at least one event is loaded */}
       {olympicEvents.length > 0 && (
         <div className='view-all'>
-          <Link to='/epreuves'>
-            <button data-testid='display-all-events'>
-              Voir toutes les épreuves
-            </button>
+          <Link
+            to='/epreuves'
+            data-testid='display-all-events'
+            className='button'
+          >
+            Voir toutes les épreuves
           </Link>
         </div>
       )}

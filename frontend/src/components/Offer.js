@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Offer = ({ offer }) => {
   const { name, description, price } = offer;
@@ -7,10 +8,10 @@ const Offer = ({ offer }) => {
     <div className='offer-card' data-testid='offer'>
       <h3 data-testid='offer-heading'>{name}</h3>
       <p data-testid='offer-description'>{description}</p>
-      <p data-testid='offer-price'>
-        <strong>Prix :</strong> {price}
-      </p>
-      <button>Sélectionner l'offre {name}</button>
+      <p data-testid='offer-price'>{price} €</p>
+      <Link to='/panier' className='button'>
+        Ajouter au panier
+      </Link>
     </div>
   );
 };
