@@ -245,6 +245,29 @@ a.button {
   background-color: #a6082a;
 }
 
+.button {
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.button.clicked {
+  animation: flash 0.15s forwards;
+}
+
+@keyframes flash {
+  0% {
+    transform: scale(1);
+    background-color: #a77833;
+  }
+  50% {
+    transform: scale(0.95);
+    background-color: #f1b457;
+  }
+  100% {
+    transform: scale(1);
+    background-color: #a77833;
+  }
+}
+
 /***************/
 /* offer cards */
 /***************/
