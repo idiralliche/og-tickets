@@ -14,18 +14,26 @@ const Header = () => {
   };
 
   return (
-    <header className="header">
-      <div className="logo">
+    <header className='header'>
+      <div className='logo'>
         <a href='/'>
-          <img src={`${process.env.PUBLIC_URL}/og-tickets-w.svg`} alt="og-tickets logo" />
+          <img
+            src={`${process.env.PUBLIC_URL}/og-tickets-w.svg`}
+            alt='og-tickets logo'
+          />
         </a>
       </div>
 
       <nav>
         <NavLinks />
 
-        <div className="burger-menu" onClick={toggleMenu}>{menuOpen ? <FaTimes /> : <FaBars />}</div>
-        <div className={`mobile-nav ${menuOpen ? 'open' : ''}`} onClick={closeMenu}>
+        <div className='burger-menu' onClick={toggleMenu}>
+          {menuOpen ? <FaTimes /> : <FaBars />}
+        </div>
+        <div
+          className={`mobile-nav ${menuOpen ? 'open' : ''}`}
+          onClick={closeMenu}
+        >
           <NavLinks onLinkClick={toggleMenu} />
         </div>
       </nav>
