@@ -1,16 +1,4 @@
 services:
-  builder:
-    image: node:16-alpine
-    working_dir: /app
-     # Install dependencies and run watch build using chokidar-cli
-    environment:
-      SHELL: /bin/sh
-    command: sh -c "npm install && npm run watch:build"
-    volumes:
-      - ./:/app
-    networks:
-      - ogtickets_nw
-
   nginx:
     build: ./nginx
     container_name: nginx_proxy
