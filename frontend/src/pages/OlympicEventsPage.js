@@ -40,7 +40,7 @@ const OlympicEventsPage = () => {
           <p className='error-message'>⚠️ {error}</p>
           <button
             onClick={() => window.location.reload()}
-            className='retry-button'
+            className='button retry-button'
           >
             Réessayer
           </button>

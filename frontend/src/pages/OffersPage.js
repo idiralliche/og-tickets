@@ -41,7 +41,7 @@ const OffersPage = () => {
               <p className='error-message'>⚠️ {error}</p>
               <button
                 onClick={() => window.location.reload()}
-                className='retry-button'
+                className='button retry-button'
               >
                 Réessayer
               </button>
@@ -57,10 +57,8 @@ const OffersPage = () => {
           ))}
         </div>
         <div className='view-all'>
-          <Link to='/'>
-            {' '}
-            {/*Path vers le panier */}
-            <button>Voir mon panier</button>
+          <Link to='/panier' className='retry-button button'>
+            Voir mon panier
           </Link>
         </div>
       </div>

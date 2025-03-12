@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import SportIcon from './SportIcon';
 
 const OlympicEvent = ({ olympicEvent }) => {
@@ -30,7 +31,9 @@ const OlympicEvent = ({ olympicEvent }) => {
         <p>{description}</p>
       </div>
 
-      <button>Réserver</button>
+      <Link className='button' to='/offres'>
+        Réserver
+      </Link>
     </div>
   );
 };
