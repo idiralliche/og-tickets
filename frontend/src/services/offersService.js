@@ -17,11 +17,11 @@ export const getOffers = async () => {
 
         if (!response.ok) {
             if (response.status === 404) {
-                throw new Error("Les offres ne sont pas disponibles pour le moment.");
+                throw new Error('Les offres ne sont pas disponibles pour le moment.');
             } else if (response.status === 500) {
-                throw new Error("Erreur serveur, veuillez réessayer plus tard.");
+                throw new Error('Erreur serveur, veuillez réessayer plus tard.');
             } else if (response.status === 401 || response.status === 403) {
-                throw new Error("Accès refusé. Veuillez vérifier vos identifiants.");
+                throw new Error('Accès refusé. Veuillez vérifier vos identifiants.');
             } else {
                 throw new Error(`Erreur ${response.status}: ${response.statusText}`);
             }
@@ -30,7 +30,7 @@ export const getOffers = async () => {
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-            throw new Error("Format de réponse invalide.");
+            throw new Error('Format de réponse invalide.');
         }
 
         // Validate each offer using offerSchema
@@ -40,7 +40,7 @@ export const getOffers = async () => {
                     await offerSchema.validate(offer, { abortEarly: false });
                     return offer;
                 } catch (validationError) {
-                    console.warn("Offre invalide ignorée:", offer, validationError.errors);
+                    console.warn('Offre invalide ignorée:', offer, validationError.errors);
                     return null;
                 }
             })
@@ -49,13 +49,13 @@ export const getOffers = async () => {
         const filteredOffers = validatedOffers.filter((offer) => offer !== null);
 
         if (filteredOffers.length === 0) {
-            throw new Error("Aucune offre valide trouvée.");
+            throw new Error('Aucune offre valide trouvée.');
         }
 
         return filteredOffers;
     } catch (error) {
         if (error.name === 'AbortError') {
-            throw new Error("La connexion avec le serveur a expiré.");
+            throw new Error('La connexion avec le serveur a expiré.');
         }
         throw error;
     }

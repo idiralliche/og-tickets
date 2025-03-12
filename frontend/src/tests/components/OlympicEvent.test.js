@@ -4,15 +4,12 @@ import OlympicEvent from '../../components/OlympicEvent';
 
 describe('OlympicEvent component', () => {
     const olympicEvent = {
-        model: 'contests.contest',
-        pk: 1,
-        fields: {
-            sport: 'Basketball',
-            name: "Hommes, phase de groupe",
-            description: 'Group C, Jeu 19',
-            date_time: '2024-07-31T17:15:00Z',
-            location: 'Stade Pierre Mauroy'
-        }
+        id: 1,
+        sport: 'Basketball',
+        name: 'Hommes, phase de groupe',
+        description: 'groupe C, Jeu 19',
+        date_time: '2024-07-31T17:15:00Z',
+        location: 'Stade Pierre Mauroy',
     };
 
     test('renders the event structure correctly', () => {
@@ -49,4 +46,3 @@ describe('OlympicEvent component', () => {
         expect(asFragment()).toMatchSnapshot();
     });
 });
-

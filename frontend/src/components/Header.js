@@ -25,7 +25,7 @@ const Header = () => {
         <NavLinks />
 
         <div className="burger-menu" onClick={toggleMenu}>{menuOpen ? <FaTimes /> : <FaBars />}</div>
-        <div className={`mobile-nav ${menuOpen ? "open" : ""}`} onClick={closeMenu}>
+        <div className={`mobile-nav ${menuOpen ? 'open' : ''}`} onClick={closeMenu}>
           <NavLinks onLinkClick={toggleMenu} />
         </div>
       </nav>

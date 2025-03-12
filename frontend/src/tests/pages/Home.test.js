@@ -24,12 +24,12 @@ describe('Home page', () => {
     test('displays events when loaded by showing the "view all events" button', async () => {
         const validData = [
             {
-                "id": 1,
-                "sport": "Basketball",
-                "name": "Hommes, phase de groupe",
-                "description": "groupe C, Jeu 19",
-                "date_time": "2024-07-31T17:15:00Z",
-                "location": "Stade Pierre Mauroy"
+                id: 1,
+                sport: 'Basketball',
+                name: 'Hommes, phase de groupe',
+                description: 'groupe C, Jeu 19',
+                date_time: '2024-07-31T17:15:00Z',
+                location: 'Stade Pierre Mauroy',
             }
         ];
         getOlympicEvents.mockResolvedValue(validData);

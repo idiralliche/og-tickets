@@ -20,11 +20,11 @@ describe('getOlympicEvents service', () => {
         const validData = [
             {
                 id: 1,
-                sport: "Basketball",
-                name: "Hommes, phase de groupe",
-                description: "groupe C, Jeu 19",
-                date_time: "2024-07-31T17:15:00Z",
-                location: "Stade Pierre Mauroy"
+                sport: 'Basketball',
+                name: 'Hommes, phase de groupe',
+                description: 'groupe C, Jeu 19',
+                date_time: '2024-07-31T17:15:00Z',
+                location: 'Stade Pierre Mauroy',
             }
         ];
         fetchMock.mockResponseOnce(JSON.stringify(validData));
@@ -37,19 +37,19 @@ describe('getOlympicEvents service', () => {
         const dataWithInvalid = [
             {
                 id: 1,
-                sport: "Basketball",
-                name: "Hommes, phase de groupe",
-                description: "groupe C, Jeu 19",
-                date_time: "2024-07-31T17:15:00Z",
-                location: "Stade Pierre Mauroy"
+                sport: 'Basketball',
+                name: 'Hommes, phase de groupe',
+                description: 'groupe C, Jeu 19',
+                date_time: '2024-07-31T17:15:00Z',
+                location: 'Stade Pierre Mauroy',
             },
             {
                 id: 2,
-                sport: "", // Invalid: empty string
-                name: "",
-                description: "",
-                date_time: "invalid-date",
-                location: ""
+                sport: '', // Invalid: empty string
+                name: '',
+                description: '',
+                date_time: 'invalid-date',
+                location: ''
             }
         ];
         fetchMock.mockResponseOnce(JSON.stringify(dataWithInvalid));
