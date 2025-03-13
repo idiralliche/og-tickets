@@ -33,12 +33,16 @@ const OffersPage = () => {
           {loading && (
             <div className='spinner-container' data-testid='loading'>
               <div className='spinner'></div>
-              <p className='loading-text'>Chargement des offres...</p>
+              <p className='loading-text info-message'>
+                Chargement des offres...
+              </p>
             </div>
           )}
           {error && (
             <div className='error-container' data-testid='error'>
-              <p className='error-message'>⚠️ {error}</p>
+              <p className='error-message info-message'>
+                ⚠️ Les offres n'ont pas pu être récupérées.
+              </p>
               <button
                 onClick={() => window.location.reload()}
                 className='button retry-button'
@@ -48,7 +52,7 @@ const OffersPage = () => {
             </div>
           )}
           {!loading && !error && offers.length === 0 && (
-            <p data-testid='no-offers' className='no-offers'>
+            <p data-testid='no-offers' className='no-offers info-message'>
               Aucune offre disponible.
             </p>
           )}
