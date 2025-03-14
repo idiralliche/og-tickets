@@ -1,0 +1,36 @@
+@use 'variables';
+
+body {
+  max-width: 100vw;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: variables.$purple-dark;
+  color: variables.$text-dark;
+}
+
+h1 {
+  padding: 2rem;
+  margin: 50px auto;
+  width: 80%;
+  text-align: center;
+  color: variables.$text-light;
+  font-size: 2.5rem;
+}
+
+.subtitle {
+  padding: 2rem;
+  margin: 0 auto;
+  width: 80%;
+  text-align: center;
+  font-size: 1.2rem;
+  line-height: 30px;
+  color: variables.$text-light;
+}
+
+h2 {
+  margin: 20px 0;
+  max-width: 80%;
+  color: variables.$text-light;
+  font-size: 2rem;
+}
