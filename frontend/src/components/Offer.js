@@ -22,7 +22,7 @@ const Offer = ({ offer }) => {
       <p data-testid='offer-description'>{description}</p>
       <p data-testid='offer-price'>{price} €</p>
       <button
-        className={`button ${isFlashing ? 'clicked' : ''}`}
+        className={`button ${isFlashing ? 'flash' : ''}`}
         onClick={handleAddToCart}
       >
         Ajouter au panier

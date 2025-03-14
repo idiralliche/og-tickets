@@ -1,0 +1,25 @@
+@use 'mixins';
+@use 'variables';
+
+.footer {
+  position: relative;
+  width: 100%;
+  padding: 1rem;
+  background-color: variables.$purple;
+  color: variables.$text-light;
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 30px;
+}
+
+@include mixins.media-between('phone-up', 'tablet-up') {
+  .footer {
+    margin-top: 60px;
+  }
+}
+
+@include mixins.media-min('tablet-up') {
+  .footer {
+    margin-top: 90px;
+  }
+}

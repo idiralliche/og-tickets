@@ -4,7 +4,7 @@ import Home from './pages/Home';
 import OlympicEventsPage from './pages/OlympicEventsPage';
 import OffersPage from './pages/OffersPage.js';
 import CartPage from './pages/CartPage';
-import './styles.css';
+import './main.css';
 
 const App = () => {
   return (

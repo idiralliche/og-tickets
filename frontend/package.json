@@ -13,15 +13,17 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.2.0",
     "react-scripts": "5.0.1",
+    "sass": "^1.85.1",
     "web-vitals": "^2.1.4",
     "yup": "^1.6.1"
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "npm run build:css && craco build",
     "watch:build": "chokidar 'src/**/*' -c 'npm run build'",
     "test": "craco test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:css": "sass src/sass/main.scss src/main.css --no-source-map --style=compressed"
   },
   "eslintConfig": {
     "extends": [

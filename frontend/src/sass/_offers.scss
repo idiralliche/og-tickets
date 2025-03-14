@@ -1,0 +1,45 @@
+@use 'mixins';
+@use 'variables';
+
+.offers {
+  @include mixins.flexbox-basics(column, null, center);
+  margin: 0 auto;
+  width: 90%;
+}
+
+.offers-container {
+  @include mixins.flexbox-basics(column, space-between, center);
+  margin: 10px 0;
+}
+
+.offer-card {
+  @include mixins.flexbox-basics(column, space-between, center);
+  flex-basis: 100%;
+  width: 100%;
+  height: 250px;
+  background-color: variables.$background-light;
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+  color: variables.$text-dark;
+  border: variables.$border-light;
+  border-radius: 5px;
+
+  h2 {
+    color: variables.$text-dark;
+  }
+
+  .button {
+    padding: 10px 20px;
+  }
+}
+
+@include mixins.media-min('tablet-up') {
+  .offers-container {
+    flex-direction: row;
+    margin: 50px 0;
+  }
+  .offer-card {
+    flex-basis: 25%;
+  }
+}

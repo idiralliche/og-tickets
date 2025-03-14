@@ -31,13 +31,17 @@ const OlympicEventsPage = () => {
       {loading && (
         <div className='spinner-container' data-testid='loading'>
           <div className='spinner'></div>
-          <p className='loading-text'>Chargement des épreuves...</p>
+          <p className='loading-text info-message'>
+            Chargement des épreuves...
+          </p>
         </div>
       )}
 
       {error && (
         <div className='error-container' data-testid='error'>
-          <p className='error-message'>⚠️ {error}</p>
+          <p className='error-message info-message'>
+            ⚠️ Les épreuves n'ont pas pu être récupérées.
+          </p>
           <button
             onClick={() => window.location.reload()}
             className='button retry-button'
@@ -48,7 +52,7 @@ const OlympicEventsPage = () => {
       )}
 
       {!loading && !error && olympicEvents.length === 0 && (
-        <p data-testid='no-events' className='no-events'>
+        <p data-testid='no-events' className='no-events info-message'>
           Aucune épreuve disponible.
         </p>
       )}

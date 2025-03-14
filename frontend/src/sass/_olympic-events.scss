@@ -1,0 +1,88 @@
+@use 'mixins';
+@use 'variables';
+
+.olympic-events {
+  @include mixins.flex-column;
+  padding: 10px;
+  margin: 0 auto;
+  max-width: 90%;
+}
+
+.olympic-event {
+  @include mixins.flex-column;
+  border: variables.$border-light;
+  background-color: variables.$background-light;
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+
+  h3,
+  .details {
+    width: 100%;
+    text-align: left;
+  }
+
+  h3 {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    color: variables.$purple-dark;
+    margin: 5px 0 15px 0;
+
+    svg {
+      margin-right: 10px;
+      color: variables.$red;
+    }
+  }
+
+  .details {
+    @include mixins.flex-column;
+    font-size: 0.9rem;
+    color: variables.$text-dark;
+  }
+
+  .description {
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+
+  .button {
+    padding: 20px;
+  }
+}
+
+@include mixins.media-between('phone-up', 'tablet-up') {
+  .olympic-events {
+    display: flex;
+  }
+}
+
+// olympic event container large screens block styles
+@mixin olympic-event-large($flex-basis) {
+  margin-top: 0;
+  margin-bottom: 0;
+  flex-basis: $flex-basis;
+}
+
+@include mixins.media-min('tablet-up') {
+  .olympic-event {
+    @include mixins.flexbox-basics(row, space-between);
+
+    h3 {
+      @include olympic-event-large(20%);
+    }
+    .details {
+      @include olympic-event-large(15%);
+    }
+    .description {
+      @include olympic-event-large(40%);
+    }
+    .button {
+      @include olympic-event-large(15%);
+      text-align: center;
+      align-self: center;
+    }
+  }
+}
