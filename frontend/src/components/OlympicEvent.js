@@ -32,7 +32,7 @@ const OlympicEvent = ({ olympicEvent }) => {
       </div>
 
       <Link className='button' to='/offres'>
-        Réserver
+        Voir les offres
       </Link>
     </div>
   );

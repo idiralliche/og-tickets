@@ -131,6 +131,7 @@
       color: variables.$red;
       font-size: 1.2rem;
       transition: color 0.1s ease;
+      border-color: transparent;
 
       &:hover {
         color: variables.$red-dark;

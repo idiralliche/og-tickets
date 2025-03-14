@@ -3,7 +3,9 @@ import React from 'react';
 const Footer = () => {
   return (
     <footer className='footer'>
-      <p>© 2024 Jeux Olympiques - Tous droits réservés</p>
+      <p>
+        Simulation: Application vente de billets pour les Jeux Olympiques 2024
+      </p>
     </footer>
   );
 };
