@@ -10,6 +10,11 @@ import Footer from './Footer';
 const Layout = ({ title, subtitle, children, mainClassName = '' }) => {
   return (
     <div className='layout'>
+      <div className='header-warning-message'>
+        <p>
+          <p>⚠️ Ce site est un projet à but pédagogique – tout est simulé.</p>
+        </p>
+      </div>
       <Header />
       {title && <h1>{title}</h1>}
       {subtitle && <p className='subtitle'>{subtitle}</p>}
