@@ -3,7 +3,7 @@
 @use 'sass:list';
 
 .info-message {
-  color: variables.$text-light;
+  color: variables.$text-dark;
 }
 
 .notification-banner {
@@ -34,7 +34,7 @@ $notifications: (
 
 .error-container {
   text-align: center;
-  background-color: #ffdddd;
+  background-color: variables.$purple;
   color: variables.$red;
   padding: 15px;
   border-radius: 5px;
