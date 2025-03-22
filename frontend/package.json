@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "npm run build:css && craco build",
+    "build": "craco build",
     "watch:build": "chokidar 'src/**/*' -c 'npm run build'",
     "test": "craco test",
     "eject": "react-scripts eject",
