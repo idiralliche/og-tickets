@@ -2,7 +2,8 @@
 @use 'variables';
 
 .footer {
-  position: relative;
+  position: absolute;
+  bottom: 0;
   width: 100%;
   padding: 1rem;
   background-color: variables.$purple;
