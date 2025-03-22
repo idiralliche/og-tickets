@@ -19,6 +19,10 @@
     border: variables.$border-light;
     border-radius: 4px;
   }
+
+  .info-message {
+    color: variables.$text-light;
+  }
 }
 .cart-summary {
   @include mixins.flexbox-basics(column, space-between, center);
