@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
+import Layout from '../components/layout/Layout';
 import OlympicEvent from '../components/OlympicEvent';
 import { getOlympicEvents } from '../services/olympicEventsService';
 
@@ -51,8 +51,8 @@ const OlympicEventsPage = () => {
         </p>
       )}
 
-      {olympicEvents.map((olympicEvent) => (
-        <OlympicEvent key={olympicEvent.pk} olympicEvent={olympicEvent} />
+      {olympicEvents.map((olympicEvent, index) => (
+        <OlympicEvent key={index} olympicEvent={olympicEvent} />
       ))}
     </Layout>
   );

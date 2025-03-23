@@ -1,5 +1,5 @@
 // This component provides a global layout for pages.
-// It includes a Header, Footer, dynamic title (h1), dynamic subtitle rendered as a <p> with class "home-desc",
+// It includes a Header, Footer, dynamic title (h1), dynamic subtitle rendered as a <p>",
 // and a main element with a default "content" class, which can be extended via the mainClassName prop.
 // See React documentation for composition: https://reactjs.org/docs/composition-vs-inheritance.html
 
