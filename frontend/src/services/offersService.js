@@ -58,7 +58,7 @@ export const getOffers = async () => {
       throw new Error('Aucune offre valide trouvée.');
     }
 
-    return filteredOffers;
+    return []; //filteredOffers;
   } catch (error) {
     if (error.name === 'AbortError') {
       throw new Error('La connexion avec le serveur a expiré.');
