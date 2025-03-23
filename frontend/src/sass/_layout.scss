@@ -1,12 +1,25 @@
 @use 'variables';
 
-body {
-  max-width: 100vw;
-  font-family: Arial, sans-serif;
+html {
+  height: 100%;
   margin: 0;
-  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
   background-color: variables.$purple-dark;
   color: variables.$text-dark;
+}
+
+body,
+#root,
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  max-width: 100vw;
 }
 
 h1 {
@@ -33,4 +46,11 @@ h2 {
   max-width: 80%;
   color: variables.$text-light;
   font-size: 2rem;
+}
+
+main.content {
+  flex: 1;
+  padding: 1rem;
+  margin: 0 auto;
+  width: 100%;
 }
