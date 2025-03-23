@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { getOffers } from '../services/offersService';
-import Layout from '../components/Layout';
+import Layout from '../components/layout/Layout';
 import InCartOffers from '../components/InCartOffers';
 import AddOfferButton from '../components/AddOfferButton';
 
