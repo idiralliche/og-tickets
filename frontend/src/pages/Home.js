@@ -42,12 +42,6 @@ const Home = () => {
           <p className='error-message'>
             ⚠️ Les épreuves n'ont pas pu être récupérées.
           </p>
-          <button
-            onClick={() => window.location.reload()}
-            className='button retry- button'
-          >
-            Réessayer
-          </button>
         </div>
       )}
       {!loading && !error && olympicEvents.length === 0 && (

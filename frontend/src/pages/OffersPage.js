@@ -43,12 +43,6 @@ const OffersPage = () => {
               <p className='error-message info-message'>
                 ⚠️ Les offres n'ont pas pu être récupérées.
               </p>
-              <button
-                onClick={() => window.location.reload()}
-                className='button retry-button'
-              >
-                Réessayer
-              </button>
             </div>
           )}
           {!loading && !error && offers.length === 0 && (
