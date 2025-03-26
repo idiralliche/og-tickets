@@ -1,10 +1,25 @@
 services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: /run/secrets/db_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./secrets/db_password.txt:/run/secrets/db_password:ro
+    ports:
+      - "5434:5432"
+    networks:
+      - ogtickets_nw
+
   backend:
     image: tixidest/ogtickets-backend:latest
     ports:
       - "8000:8000"
     environment:
-      ENV: prod
+      ENV: dev
     volumes:
       - ./secrets/secret_key.txt:/run/secrets/secret_key:ro
       - ./secrets/db_user.txt:/run/secrets/db_user:ro
@@ -13,9 +28,20 @@ services:
       - ./secrets/db_host.txt:/run/secrets/db_host:ro
       - ./secrets/allowed_hosts.txt:/run/secrets/allowed_hosts:ro
       - ./secrets/sentry_dsn.txt:/run/secrets/sentry_dsn:ro
+      - ./secrets/email_host.txt:/run/secrets/email_host:ro
+      - ./secrets/email_port.txt:/run/secrets/email_port:ro
+      - ./secrets/email_host_user.txt:/run/secrets/email_host_user:ro
+      - ./secrets/email_host_password.txt:/run/secrets/email_host_password:ro
+      - ./secrets/email_use_tls.txt:/run/secrets/email_use_tls:ro
+      - ./secrets/default_from_email.txt:/run/secrets/default_from_email:ro
+    depends_on:
+      - db
     networks:
       - ogtickets_nw
 
 networks:
   ogtickets_nw:
     external: true
+
+volumes:
+  postgres_data:

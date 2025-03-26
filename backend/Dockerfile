@@ -21,10 +21,12 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 # Copy project code
 COPY . .
 
-# Set production environment variables for the build stage
-# This avoids loading .env file and allows running collectstatic
-ENV ENV=prod
-ENV DEBUG=False
+# Set environment variables for the build stage
+ARG ENV=prod
+ARG DEBUG=False
+
+ENV ENV=${ENV}
+ENV DEBUG=${DEBUG}
 
 # Run collectstatic to gather static files (ensure production settings are set)
 # collectstatic requires SECRET_KEY to be set
