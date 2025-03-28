@@ -10,9 +10,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    build-essential && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy dependency file and install packages
 COPY requirements.txt .
@@ -38,6 +38,10 @@ RUN --mount=type=secret,id=secret_key,dst=/run/secrets/secret_key \
 # Stage 2: Final image
 FROM python:3.12-slim
 WORKDIR /app
+
+# Install netcat for health checks
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser

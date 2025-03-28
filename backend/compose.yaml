@@ -1,3 +1,4 @@
+# This file is only used in development, localy, to run the backend service in a container.
 services:
   db:
     image: postgres:14
@@ -5,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: /run/secrets/db_password
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./secrets/db_password.txt:/run/secrets/db_password:ro
@@ -20,6 +21,7 @@ services:
       - "8000:8000"
     environment:
       ENV: dev
+      DEBUG: "True"
     volumes:
       - ./secrets/secret_key.txt:/run/secrets/secret_key:ro
       - ./secrets/db_user.txt:/run/secrets/db_user:ro
@@ -34,6 +36,7 @@ services:
       - ./secrets/email_host_password.txt:/run/secrets/email_host_password:ro
       - ./secrets/email_use_tls.txt:/run/secrets/email_use_tls:ro
       - ./secrets/default_from_email.txt:/run/secrets/default_from_email:ro
+      - ./start-env-dev.sh:/start-env-dev.sh
     depends_on:
       - db
     networks:
