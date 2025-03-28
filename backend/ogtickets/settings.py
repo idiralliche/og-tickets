@@ -53,14 +53,17 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'rest_framework',
+    'djoser',
     'corsheaders',
     'olympic_events',
     'offers',
+    'accounts',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -81,7 +84,7 @@ ROOT_URLCONF = "ogtickets.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -98,14 +101,48 @@ WSGI_APPLICATION = "ogtickets.wsgi.application"
 
 # REST Framework settings
 REST_FRAMEWORK = {
-    # Default settings (you can customize as needed)
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',  # Only return JSON responses
+        'rest_framework.renderers.JSONRenderer',
     ],
 }
+
+# DJOSER settings
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'api/auth/users/activation/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'api/auth/users/reset_password/{uid}/{token}',
+    'SEND_CONFIRMATION_EMAIL': False,
+    'SERIALIZERS': {
+        'user_create': 'accounts.serializers.CustomUserCreateSerializer',
+        'user': 'accounts.serializers.CustomUserSerializer',
+    }
+}
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Email settings
+
+if not os.getenv('EMAIL_HOST'):
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ['true', '1', 'yes']
+    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+
+
+
 
 # Database
 DATABASES = {
@@ -114,12 +151,12 @@ DATABASES = {
         'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
+        'HOST': os.getenv('DATABASE_HOST', 'db'),
         'PORT': int(os.getenv('DATABASE_PORT', 5432)),
         'OPTIONS': {}  # sslmode only set in production, see below
     },
 }
-if os.getenv('ENV', 'dev') in ['prod', 'production']:
+if ENV in ['prod', 'production']:
     DATABASES['default']['OPTIONS']['sslmode'] = 'require'
 
 # Password validation
@@ -141,9 +178,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = 'fr'
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
 
