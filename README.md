@@ -31,7 +31,7 @@ Accédez à l'application déployée sur [https://og-tickets.vercel.app/](https:
 
 L'architecture du projet repose sur une séparation claire entre le frontend et le backend :
 
-### Frontend :
+### Frontend :
 
 - **Technologies** : Application React (Javascript + SCSS)
 - **Déploiement** : Vercel (déploiement automatisé depuis le repo sur github, scalabilité automatique et CDN.).
