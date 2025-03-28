@@ -10,26 +10,20 @@ Accédez à l'application déployée sur [https://og-tickets.vercel.app/](https:
 
 - [Fonctionnalités](#fonctionnalités)
 - [Architecture](#architecture)
+  - [Backend et Simulation de Micro-services](#backend-et-simulation-de-micro-services)
 - [Technologies utilisées](#technologies-utilisées)
-- [Prérequis](#prérequis)
-- [Installation et configuration](#installation-et-configuration)
-  - [Cloner le projet](#cloner-le-projet)
-  - [Déployer le backend](#déployer-le-backend)
-  - [Déployer le frontend](#déployer-le-frontend)
-- [Tests et monitoring](#tests-et-monitoring)
-- [CI/CD et déploiement continu](#cicd-et-déploiement-continu)
-- [Contribution](#contribution)
-- [Licence](#licence)
+- [Mesures de sécurité](#mesures-de-sécurité)
+- [Conclusion](#conclusion)
 
 ---
 
 ## Fonctionnalités
 
+- **Consultation publique des épreuves et des offres (pour utilisateurs non authentifiés)**
 - **Création et gestion de comptes utilisateurs sécurisés**
 - **Réservation d'e-tickets pour diverses catégories** (individuel, duo, familial)
 - **Système de paiement sécurisé**
 - **Téléchargement et vérification d'e-tickets via une double clé de sécurité**
-- **Consultation publique des épreuves et des offres (pour utilisateurs non authentifiés)**
 
 ---
 
@@ -37,173 +31,96 @@ Accédez à l'application déployée sur [https://og-tickets.vercel.app/](https:
 
 L'architecture du projet repose sur une séparation claire entre le frontend et le backend :
 
-- **Frontend** : Application React déployée sur Vercel.
-- **Backend** : API Django/DRF déployée dans des containers Docker sur une instance EC2 et orchestrée en production avec Docker Swarm.
-- **Base de données** : PostgreSQL gérée par AWS RDS, accessible uniquement en interne ou via un tunnel sécurisé.
-- **Reverse proxy** : Nginx sert de reverse proxy pour assurer la terminaison TLS et rediriger le trafic HTTPS vers le backend.
-- **Gestion des secrets** : Les données sensibles (clé Django, informations de connexion à la BDD, etc.) sont gérées via Docker Secrets en production et par des montages de volumes pour le développement local.
+### Frontend :
+
+- **Technologies** : Application React (Javascript + SCSS)
+- **Déploiement** : Vercel (déploiement automatisé depuis le repo sur github, scalabilité automatique et CDN.).
+- **Fonctionnalités** : Consultation publique des épreuves et des offres ainsi qu'un panier hors connexion, et interfaces sécurisées pour la création et la gestion de compte utilisateur, et pour l'achat et la gestion des billets une fois l'utilisateur authentifié.
+
+### Backend :
+
+- **Technologies** : API Django/DRF
+- **Authentification** : Utilisation de Djoser pour la gestion des inscriptions, activations et réinitialisations de mot de passe, couplé avec JWT pour l'authentification.
+- **Containerisation** : Déployé dans des containers Docker. Docker Swarm orchestre les services sur une instance AWS EC2.
+- **Base de données** : PostgreSQL hébergé sur AWS RDS, accessible uniquement via un tunnel sécurisé (instance AWS EC2 du backend Django) ou par des règles strictes de sécurité réseau.
+- **Reverse Proxy et TLS** : Nginx est utilisé comme reverse proxy pour gérer la terminaison TLS.
+- **Secrets et Variables sensibles** : Les données sensibles (clé Django, informations de connexion à la BDD, identifiants SMTP, etc.) sont gérées via Docker Secrets en production et par Docker BuildKit pour le build de l'image (clé Django requise).
+- **Monitoring** : Sentry est intégré pour capturer et surveiller en temps réel les erreurs et exceptions.
+
+### DNS, Cloudflare :
+
+Le domaine est géré par Cloudflare, qui fournit un DNS scalable, des fonctionnalités de protection contre les attaques DDoS, des règles personnalisées pour les accès aux URI, et d'autre fonctionnalités liées à la sécurité.
+
+### Backend et Simulation de Micro-services
+
+Le backend de **og-tickets** a été conçu de manière modulaire en utilisant la structure des applications Django pour simuler une architecture de micro-services. Chaque fonctionnalité du système est isolée dans une app dédiée :
+
+- **accounts** gère l'authentification, la gestion des utilisateurs et la sécurité via Djoser et JWT.
+- **offers** s'occupe de la gestion des offres de billets.
+- **olympic_events** gère l'affichage et l'administration des événements sportifs.
+- Les autres services ne sont pas encore développés mais la'étape suivante est **cart** pour gérer le panier utilisateur...
+
+Cette organisation offre plusieurs avantages :
+
+- **Séparation des préoccupations** : Chaque app est responsable uniquement de ses fonctionnalités spécifique, ce qui facilite la compréhension, le développement et la maintenance du code.
+- **Modularité et évolutivité** : Bien que l'architecture reste en réalité monolithique, la séparation en apps permet d'isoler les évolutions et les tests et d'envisager à terme une scalabilité horizontale en cas de besoin, en transformant chaque module en service indépendant si le projet doit évoluer.
+- **Bonne pratique industrielle** : Cette approche s'inspire des principes des micro-services, en montrant une compréhension approfondie des avantages de la décomposition fonctionnelle. Elle démontre également la capacité à organiser un projet de grande envergure de façon professionnelle, tout en tirant parti de la robustesse et de la simplicité offertes par Django.
+
+Cette stratégie de développement renforce la maintenabilité et la testabilité du backend, tout en facilitant une potentielle migration vers une architecture de micro-services à part entière si l'échelle du projet l'exige.
 
 ---
 
 ## Technologies utilisées
 
-- **Frontend** : React, JavaScript/TypeScript, CSS
-- **Backend** : Django 5.x, Django REST Framework
-- **Base de données** : PostgreSQL
-- **Containerisation** : Docker, Docker Compose (développement), Docker Swarm (production)
-- **Reverse proxy et HTTPS** : Nginx, Certbot
-- **Secrets et sécurité** : Docker BuildKit (montage de secrets pendant le build), Docker Secrets pour Swarm
-- **Monitoring** : Sentry
-- **Tests** : Django Test Framework, pytest (optionnel)
+### Frontend :
+
+- React, JavaScript, SCSS
+- Déploiement sur Vercel : scalabilité automatique, CDN.
+
+### Backend :
+
+- Django 5.x, Django REST Framework
+- Authentification via Djoser et JWT
+- PostgreSQL (AWS RDS)
+- Containerisation avec Docker, orchestration en production avec Docker Swarm
+- Reverse proxy avec Nginx
+- Gestion des secrets via Docker Secrets (docker swarm) et Docker BuildKit (montage de secrets pendant le build de l'image docker du backend Django)
+- Monitoring avec Sentry
+
+### Infrastructure et Sécurité DNS :
+
+- DNS et protection DDoS assurés par Cloudflare
+- Configuration des enregistrements DNS (MX, TXT, CNAME) pour la messagerie et le trafic SMTP
+
+### Tests :
+
+- Django Test Framework
 
 ---
 
-## Prérequis
+## Mesures de Sécurité
 
-- [Docker](https://docs.docker.com/get-docker/) installé sur votre machine
-- [Docker Compose](https://docs.docker.com/compose/install/) pour le développement local (version v2+)
-- [Node.js](https://nodejs.org/en/download)
-- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
+### Authentification et Autorisation :
 
----
+- Inscription sécurisée avec vérification par email via Djoser
+- Utilisation de JWT pour l'authentification des API
+- Activation d'un compte après validation de l'adresse email
 
-## Installation et configuration
+### Sécurisation des communications :
 
-### Cloner le projet
+- Utilisation de HTTPS avec TLS, géré par Nginx et Certbot
+- Reverse proxy configuré pour rediriger le trafic HTTPS vers le backend en toute sécurité
 
-```bash
-git clone https://github.com/votre-compte/og-tickets.git
-cd og-tickets
+### Gestion des Secrets :
 
-```
+- Les informations sensibles sont stockées à l'aide de Docker Secrets
 
-### Déployer le backend
+### DNS et Scalabilité :
 
-```bash
-cd backend
+- Cloudflare offre une infrastructure DNS résiliente et des fonctionnalités de protection contre les attaques DDoS
+- Les enregistrements DNS sensibles (par exemple, pour le SMTP) sont configurés en mode DNS Only afin d'assurer une communication directe et sécurisée.
 
-```
+## Conclusion
 
-#### Configuration des secrets
-
-Créez un dossier `secrets/`dans le répertoire backend (ajoutez-le à `.gitignore` pour ne pas versionner ces fichiers). Dans ce dossier, créez les fichiers suivants avec vos valeurs sensibles :
-
-- secrets/secret_key.txt
-- secrets/db_user.txt
-- secrets/db_password.txt
-- secrets/db_name.txt
-- secrets/db_host.txt
-- secrets/allowed_hosts.txt
-- secrets/sentry_dsn.txt
-
-Nous vous conseillons de restreindre les permissions de ces fichiers :
-
-```bash
-chmod 600 secrets/*.txt
-
-```
-
-#### Déploiement en développement
-
-Pour lancer l'application en local activez Docker BuildKit si nécessaire :
-
-```bash
-export DOCKER_BUILDKIT=1
-
-```
-
-Utilisez Docker Compose pour lancer les services.
-
-```bash
-docker compose up
-
-```
-
-#### Déploiement en production
-
-En production vous pourriez préférer utiliser Docker Swarm :
-
-```bash
-docker swarm init
-docker stack deploy --with-registry-auth -c stack.yaml backend_stack
-
-```
-
-### Déployer le frontend
-
-#### Installation des dépendances
-
-```bash
-cd frontend
-npm install
-
-```
-
-#### Configuration de l'API
-
-Dans le fichier `.env` du frontend (ou via la configuration de votre PaaS), définissez la variable :
-
-```env
-REACT_APP_BACKEND_BASE_URL=https://your-hostname.org/
-
-```
-
-Ainsi, votre frontend pointera vers le backend déployé.
-
-#### Lancement du frontend en développement
-
-```bash
-npm start
-
-```
-
-#### Lancement du frontend en production
-
-```bash
-npm run build
-
-```
-
-## Tests et monitoring
-
-Pour exécuter les tests Django, dans le répertoire backend, lancez :
-
-```bash
-cd backend
-python manage.py test
-
-```
-
-Pour exécuter les tests du frontend react, lancez :
-
-```bash
-cd frontend
-npm test
-
-```
-
-Pour activer le monitoring du backend via Sentry, ajoutez votre DSN dans le fichier `backend/secrets/sentry_dsn.txt` et redéployez l'application backend.
-
----
-
-## CI/CD et déploiement continu
-
-Pour le moment, l'application est déployée manuellement. Cependant, vous pouvez configurer un pipeline CI/CD avec GitHub Actions.
-
-Pour le frontend, l'application est déployée sur Vercel. Les déploiements sont automatiques à partir de la branche principale.
-
-Pour le backend, le déploiement est effectué via Docker Swarm. Les secrets sont gérés via Docker Secrets et les fichiers secrets.
-
-Pour le reverse proxy et le TLS, nous utilisons Nginx et Certbot. Nginx est configuré pour rediriger le trafic HTTPS vers le backend via un tunnel sécurisé.
-
----
-
-## Contribution
-
-L'applicaiton est en cour de développement et sert un objectif pédagogique. Pour le moment il n'est donc pas ouvert aux contributions.
-
----
-
-## Licence
-
-Le projet est sous licence MIT.
+**og-tickets** est un projet de démonstration complet, conçu selon des standards professionnels de développement, de déploiement et de sécurité. L'architecture découplée, l'utilisation de technologies modernes (Docker, Django, React, Cloudflare, Nginx) et la gestion rigoureuse des secrets et des communications sécurisées illustrent l'approche robuste adoptée pour répondre aux exigences du projet.
+Ce projet démontre que l'on peut simuler à moindre coût, (pour un projet personnel avec un objectif de démonstration) une application web sécurisée et scalable, avec un focus sur la séparation des responsabilités entre frontend et backend, une gestion fine des accès et une intégration de solutions de sécurité et de monitoring.
