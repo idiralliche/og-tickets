@@ -7,7 +7,6 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError("L’adresse email doit être renseignée")
         email = self.normalize_email(email)
-        extra_fields.setdefault('role', 'customer')  # Par défaut, inscription en tant que customer
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -17,6 +16,8 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('role', 'admin')
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
         if extra_fields.get('is_staff') is not True:
             raise ValueError("Configuration invalide pour le superuser.")
         if extra_fields.get('is_superuser') is not True:
@@ -28,12 +29,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
     email = models.EmailField(unique=True)
-    ROLE_CHOICES = (
+
+    role = models.CharField(max_length=50, choices=(
         ('admin', 'Admin'),
         ('customer', 'Customer'),
-    )
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='customer')
-    
+    ), default='customer')
+
     # AccountStatus
     is_active = models.BooleanField(default=False)
     # Admin backoffice access

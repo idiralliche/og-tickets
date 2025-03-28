@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}Administration Og-Tickets{% endblock %}
+
+{% block branding %}
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{% trans "Administration Og-Tickets" %}</a>
+  </h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
