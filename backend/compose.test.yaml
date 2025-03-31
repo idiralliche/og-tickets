@@ -1,0 +1,31 @@
+# This file is only used in development, localy, to run the backend service in a container.
+services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: test_ogtickets_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+    networks:
+      - test_net
+
+  backend:
+    image: tixidest/ogtickets-backend:latest
+    environment:
+      ENV: test
+      DEBUG: "True"
+      SECRET_KEY: "test_dummy-secret-key&1234"
+      DATABASE_NAME:  "test_ogtickets_db"
+      DATABASE_USER: "test_user"
+      DATABASE_PASSWORD: "test_password"
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+    depends_on:
+      - db
+    networks:
+      - test_net
+    command: python manage.py test
+
+networks:
+  test_net:

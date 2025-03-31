@@ -6,10 +6,9 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./secrets/db_password.txt:/run/secrets/db_password:ro
     ports:
       - "5434:5432"
     networks:
@@ -22,6 +21,19 @@ services:
     environment:
       ENV: dev
       DEBUG: "True"
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_HOST: ${DATABASE_HOST}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      SENTRY_DSN: ${SENTRY_DSN}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
     volumes:
       - ./secrets/secret_key.txt:/run/secrets/secret_key:ro
       - ./secrets/db_user.txt:/run/secrets/db_user:ro
@@ -36,7 +48,7 @@ services:
       - ./secrets/email_host_password.txt:/run/secrets/email_host_password:ro
       - ./secrets/email_use_tls.txt:/run/secrets/email_use_tls:ro
       - ./secrets/default_from_email.txt:/run/secrets/default_from_email:ro
-      - ./start-env-dev.sh:/start-env-dev.sh
+    command: sh /start.sh
     depends_on:
       - db
     networks:
