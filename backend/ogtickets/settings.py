@@ -27,18 +27,6 @@ if ENV in ['prod', 'production'] and SENTRY_DSN:
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-if ENV == 'test':
-    ENV_TEST_FILEPATH = os.path.join(BASE_DIR, '.env.test')
-    # ".env.test" file is required for testing
-    if os.path.exists(ENV_TEST_FILEPATH):
-        load_dotenv(ENV_TEST_FILEPATH, override=True)
-    else: 
-        raise Exception(f"Missing .env.test file at {ENV_TEST_FILEPATH}")
-else:
-    # Production environment: expect secrets to be provided via environment variables
-    # No .env file is loaded
-    pass
-
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 # Set ALLOWED_HOSTS from the environment variable; default to 'localhost,127.0.0.1,[::1]' to allow local IPv4 and IPv6.
@@ -125,7 +113,6 @@ DJOSER = {
         'user': 'accounts.serializers.CustomUserSerializer',
     }
 }
-
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Email settings
@@ -140,9 +127,6 @@ else:
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
     EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ['true', '1', 'yes']
     DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
-
-
-
 
 # Database
 DATABASES = {
@@ -175,7 +159,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 LANGUAGE_CODE = 'fr'
@@ -186,13 +169,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_URL = "/static/"
 # Directory where collectstatic will gather all static files.
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

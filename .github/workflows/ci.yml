@@ -1,0 +1,100 @@
+name: CI/CD Backend Production Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Création des fichiers secrets dans le répertoire backend sur le runner
+      - name: Create secret files for Docker build
+        run: |
+          mkdir -p backend/secrets
+          echo "${{ secrets.SECRET_KEY }}" > backend/secrets/secret_key.txt
+          echo "${{ secrets.DB_USER }}" > backend/secrets/db_user.txt
+          echo "${{ secrets.DB_PASSWORD }}" > backend/secrets/db_password.txt
+          echo "${{ secrets.DB_NAME }}" > backend/secrets/db_name.txt
+          echo "${{ secrets.DB_HOST }}" > backend/secrets/db_host.txt
+          echo "${{ secrets.ALLOWED_HOSTS }}" > backend/secrets/allowed_hosts.txt
+          echo "${{ secrets.SENTRY_DSN }}" > backend/secrets/sentry_dsn.txt
+          echo "${{ secrets.EMAIL_HOST }}" > backend/secrets/email_host.txt
+          echo "${{ secrets.EMAIL_PORT }}" > backend/secrets/email_port.txt
+          echo "${{ secrets.EMAIL_HOST_USER }}" > backend/secrets/email_host_user.txt
+          echo "${{ secrets.EMAIL_HOST_PASSWORD }}" > backend/secrets/email_host_password.txt
+          echo "${{ secrets.EMAIL_USE_TLS }}" > backend/secrets/email_use_tls.txt
+          echo "${{ secrets.DEFAULT_FROM_EMAIL }}" > backend/secrets/default_from_email.txt
+
+      - name: Build Docker image
+        run: |
+          DOCKER_BUILDKIT=1 docker build \
+            --build-arg ENV=prod \
+            --build-arg DEBUG=false \
+            --secret id=secret_key,src=backend/secrets/secret_key.txt \
+            -t tixidest/ogtickets-backend:latest \
+            -f backend/Dockerfile backend
+
+      - name: Run backend tests
+        run: |
+          docker compose -f backend/compose.test.yaml up --abort-on-container-exit
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push tixidest/ogtickets-backend:latest
+
+      - name: Deploy to production via SSH
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT }}
+          script: |
+            echo "Mise à l'échelle du service existant à 0..."
+            docker service scale ogtickets_backend_backend=0
+            echo "Attente de 20 secondes pour que le service s'arrête..."
+            sleep 20
+            echo "Suppression de l'ancienne stack..."
+            docker stack rm ogtickets_backend
+            echo "Attente de 20 secondes pour que la suppression soit effective..."
+            sleep 20
+            echo "Mise à jour du dépôt sur l'instance..."
+            cd /home/ubuntu/og-tickets/ && git pull
+            echo "Pull de la nouvelle image depuis Docker Hub..."
+            docker pull tixidest/ogtickets-backend:latest
+            echo "Création des secrets Docker..."
+            docker secret create secret_key backend/secrets/secret_key.txt
+            docker secret create db_user backend/secrets/db_user.txt
+            docker secret create db_password backend/secrets/db_password.txt
+            docker secret create db_name backend/secrets/db_name.txt
+            docker secret create db_host backend/secrets/db_host.txt
+            docker secret create allowed_hosts backend/secrets/allowed_hosts.txt
+            docker secret create sentry_dsn backend/secrets/sentry_dsn.txt
+            docker secret create email_host backend/secrets/email_host.txt
+            docker secret create email_port backend/secrets/email_port.txt
+            docker secret create email_host_user backend/secrets/email_host_user.txt
+            docker secret create email_host_password backend/secrets/email_host_password.txt
+            docker secret create email_use_tls backend/secrets/email_use_tls.txt
+            docker secret create default_from_email backend/secrets/default_from_email.txt
+            echo "Déploiement de la nouvelle stack..."
+            docker stack deploy -c backend/stack.yaml ogtickets_backend
