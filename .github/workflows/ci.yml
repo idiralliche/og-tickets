@@ -18,6 +18,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::242201274370:role/GitHubActionsDeployRole
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
