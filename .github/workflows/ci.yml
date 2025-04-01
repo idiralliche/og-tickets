@@ -27,7 +27,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::242201274370:role/GitHubActionsDeployRole
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: eu-west-3
           audience: sts.amazonaws.com
 
       - name: Set up Docker Buildx
