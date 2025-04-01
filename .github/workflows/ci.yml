@@ -11,6 +11,10 @@ on:
     paths:
       - 'backend/**'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -38,6 +42,7 @@ jobs:
           echo "${{ secrets.DB_NAME }}" > backend/secrets/db_name.txt
           echo "${{ secrets.DB_HOST }}" > backend/secrets/db_host.txt
           echo "${{ secrets.ALLOWED_HOSTS }}" > backend/secrets/allowed_hosts.txt
+          echo "${{ secrets.CORS_ALLOWED_ORIGINS }}" > backend/secrets/cors_allowed_origins.txt
           echo "${{ secrets.SENTRY_DSN }}" > backend/secrets/sentry_dsn.txt
           echo "${{ secrets.EMAIL_HOST }}" > backend/secrets/email_host.txt
           echo "${{ secrets.EMAIL_PORT }}" > backend/secrets/email_port.txt
@@ -96,6 +101,7 @@ jobs:
             docker secret create db_name backend/secrets/db_name.txt
             docker secret create db_host backend/secrets/db_host.txt
             docker secret create allowed_hosts backend/secrets/allowed_hosts.txt
+            docker secret create cors_allowed_origins backend/secrets/cors_allowed_origins.txt
             docker secret create sentry_dsn backend/secrets/sentry_dsn.txt
             docker secret create email_host backend/secrets/email_host.txt
             docker secret create email_port backend/secrets/email_port.txt
