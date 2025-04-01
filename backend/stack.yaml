@@ -15,6 +15,7 @@ services:
       - source: db_user
       - source: db_name
       - source: db_host
+      - source: cors_allowed_origins
       - source: allowed_hosts
       - source: email_host
       - source: email_port
@@ -52,6 +53,8 @@ secrets:
     file: secrets/db_host.txt
   allowed_hosts:
     file: secrets/allowed_hosts.txt
+  cors_allowed_origins:
+    file: secrets/cors_allowed_origins.txt
   sentry_dsn:
     file: secrets/sentry_dsn.txt
   email_host:

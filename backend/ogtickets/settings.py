@@ -60,12 +60,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# CORS : Transform ALLOWED_HOSTS to include "http" or "https" scheme
+# CORS include "http" or "https" scheme
 scheme = "http"
 if ENV in ["prod","production"] :
     scheme = "https"
 
-CORS_ALLOWED_ORIGINS = [f"{scheme}://{host}" for host in ALLOWED_HOSTS]
+CORS_ALLOWED_ORIGINS = [f"{scheme}://{host}" for host in os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')]
 
 ROOT_URLCONF = "ogtickets.urls"
 

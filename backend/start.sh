@@ -26,6 +26,7 @@ export EMAIL_HOST_USER=$(cat /run/secrets/email_host_user | tr -d '\n')
 export EMAIL_HOST_PASSWORD=$(cat /run/secrets/email_host_password | tr -d '\n')
 export EMAIL_USE_TLS=$(cat /run/secrets/email_use_tls | tr -d '\n')
 export DEFAULT_FROM_EMAIL=$(cat /run/secrets/default_from_email | tr -d '\n')
+export CORS_ALLOWED_ORIGINS=$(cat /run/secrets/cors_allowed_origins | tr -d '\n')
 
 # Wait for the database to be ready
 wait_for_db
