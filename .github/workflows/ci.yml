@@ -78,7 +78,7 @@ jobs:
             sleep 20
           fi
           echo "Mise à jour du dépôt sur l'instance..."
-          cd /home/ubuntu/og-tickets/ && git pull
+          cd /home/ubuntu/og-tickets/ && git pull origin main
           echo "Pull de la nouvelle image depuis Docker Hub..."
           docker pull tixidest/ogtickets-backend:latest
           echo "Création des secrets Docker..."
