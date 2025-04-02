@@ -66,11 +66,15 @@ jobs:
       - name: Deploy to production
         run: |
           echo "Mise à l'échelle du service existant à 0..."
-          docker service scale ogtickets_backend_backend=0
+          if docker service inspect ogtickets_backend_backend &> /dev/null; then
+            docker service scale ogtickets_backend_backend=0
+          fi
           echo "Attente de 20 secondes pour que le service s'arrête..."
           sleep 20
           echo "Suppression de l'ancienne stack..."
-          docker stack rm ogtickets_backend
+          if docker stack ls | grep -q ogtickets_backend; then
+            docker stack rm ogtickets_backend
+          fi
           echo "Attente de 20 secondes pour que la suppression soit effective..."
           sleep 20
           echo "Mise à jour du dépôt sur l'instance..."
