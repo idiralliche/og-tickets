@@ -65,18 +65,18 @@ jobs:
 
       - name: Deploy to production
         run: |
-          echo "Mise à l'échelle du service existant à 0..."
           if docker service inspect ogtickets_backend_backend &> /dev/null; then
+            echo "Mise à l'échelle du service existant à 0..."
             docker service scale ogtickets_backend_backend=0
+            echo "Attente de 20 secondes pour que le service s'arrête..."
+            sleep 20
           fi
-          echo "Attente de 20 secondes pour que le service s'arrête..."
-          sleep 20
-          echo "Suppression de l'ancienne stack..."
           if docker stack ls | grep -q ogtickets_backend; then
+            echo "Suppression de l'ancienne stack..."
             docker stack rm ogtickets_backend
+            echo "Attente de 20 secondes pour que la suppression soit effective..."
+            sleep 20
           fi
-          echo "Attente de 20 secondes pour que la suppression soit effective..."
-          sleep 20
           echo "Mise à jour du dépôt sur l'instance..."
           cd /home/ubuntu/og-tickets/ && git pull
           echo "Pull de la nouvelle image depuis Docker Hub..."
