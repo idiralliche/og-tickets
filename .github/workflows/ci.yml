@@ -55,7 +55,7 @@ jobs:
 
       - name: Run backend tests
         run: |
-          docker compose -f backend/compose.test.yaml up --abort-on-container-exit
+          docker compose --file backend/compose.test.yaml up --abort-on-container-exit
 
       - name: Deploy to production
         run: |
