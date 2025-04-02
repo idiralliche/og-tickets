@@ -55,7 +55,13 @@ jobs:
 
       - name: Run backend tests
         run: |
-          docker compose --file backend/compose.test.yaml up --exit-code-from tests --abort-on-container-exit
+          docker compose --file backend/compose.test.yaml up \
+            --exit-code-from backend \
+            --abort-on-container-exit
+
+      - name: Cleanup Docker
+        run: |
+          docker compose --file backend/compose.test.yaml down --volumes --remove-orphans
 
       - name: Deploy to production
         run: |

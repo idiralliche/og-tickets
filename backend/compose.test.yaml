@@ -2,7 +2,7 @@
 services:
   db:
     image: postgres:14
-    restart: always
+    restart: on-failure
     environment:
       POSTGRES_DB: test_ogtickets_db
       POSTGRES_USER: test_user
