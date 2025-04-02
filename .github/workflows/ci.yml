@@ -81,6 +81,10 @@ jobs:
           cd /home/ubuntu/og-tickets/ && git pull origin main
           echo "Pull de la nouvelle image depuis Docker Hub..."
           docker pull tixidest/ogtickets-backend:latest
+          echo "Suppression des anciens secrets Docker..."
+          for secret in $(docker secret ls --format "{{.Name}}"); do
+            docker secret rm "$secret"
+          done
           echo "Création des secrets Docker..."
           docker secret create secret_key backend/secrets/secret_key.txt
           docker secret create db_user backend/secrets/db_user.txt
