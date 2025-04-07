@@ -71,7 +71,7 @@ else
 fi
 
 # Delete images (excluding $DOCKER_IMAGE)
-images_to_remove=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE")
+images_to_remove=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>")
 if [ -n "$images_to_remove" ]; then
   echo "Images à supprimer :"
   echo "$images_to_remove"
@@ -79,7 +79,7 @@ if [ -n "$images_to_remove" ]; then
     echo "Erreur : Certaines images n'ont pas pu être supprimées."
     exit 1
   }
-  remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE")
+  remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>")
   if [ -n "$remaining_images" ]; then
     echo "Erreur : Les images suivantes n'ont pas pu être supprimées :"
     echo "$remaining_images"
