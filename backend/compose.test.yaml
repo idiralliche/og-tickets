@@ -10,7 +10,7 @@ services:
     networks:
       - test_net
 
-  backend:
+  test:
     image: tixidest/ogtickets-backend:latest
     environment:
       ENV: test

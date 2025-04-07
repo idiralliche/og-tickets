@@ -15,90 +15,150 @@ permissions:
   id-token: write
   contents: read
 
-jobs:
-  deploy:
-    runs-on: self-hosted
+env:
+  WORK_PATH: '/home/ubuntu/og-tickets/backend'
+  DOCKER_IMAGE: 'tixidest/ogtickets-backend:latest'
+  STACK_NAME: 'ogtickets-backend-stack'
+  SERVICE_NAME: 'ogtickets-backend-stack_backend'
+  TIMEOUT: 120
 
+defaults:
+  run:
+    working-directory: /home/ubuntu/og-tickets
+
+jobs:
+  init-project:
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            backend
+
+      - name: Cache .git directory
+        id: cache-git
+        uses: actions/cache@v3
+        with:
+          path: /home/ubuntu/og-tickets/.git
+          key: git-cache-${{ github.sha }}
+          restore-keys: |
+            git-cache-
+
+      - name: Pull latest version of the repository
+        run: |
+          echo "Mise à jour du dépôt depuis origin/main..."
+          git fetch origin main --depth=1 || (echo "Erreur lors de la récupération des mises à jour depuis origin/main." && exit 1)
+          git reset --hard origin/main || (echo "Erreur lors de la mise à jour du dépôt avec git reset --hard." && exit 1)
+          git read-tree -mu HEAD
+          echo "Dépôt mis à jour avec succès."
+
+      - name: Verify repository state
+        run: |
+          if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+            echo "Erreur : Le dépôt n'est pas valide."
+            exit 1
+          fi
+          echo "Le dépôt est valide et prêt à être utilisé."
+
+  init-docker:
+    runs-on: self-hosted
+    steps:
+      - name: Check if Docker is set up
+        run: |
+          .github/scripts/verify-docker.sh
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Create secret files for Docker build
+      - name: Clean up Docker resources
         run: |
-          mkdir -p backend/secrets
-          echo "${{ secrets.SECRET_KEY }}" > backend/secrets/secret_key.txt
-          echo "${{ secrets.DB_USER }}" > backend/secrets/db_user.txt
-          echo "${{ secrets.DB_PASSWORD }}" > backend/secrets/db_password.txt
-          echo "${{ secrets.DB_NAME }}" > backend/secrets/db_name.txt
-          echo "${{ secrets.DB_HOST }}" > backend/secrets/db_host.txt
-          echo "${{ secrets.ALLOWED_HOSTS }}" > backend/secrets/allowed_hosts.txt
-          echo "${{ secrets.CORS_ALLOWED_ORIGINS }}" > backend/secrets/cors_allowed_origins.txt
-          echo "${{ secrets.SENTRY_DSN }}" > backend/secrets/sentry_dsn.txt
-          echo "${{ secrets.EMAIL_HOST }}" > backend/secrets/email_host.txt
-          echo "${{ secrets.EMAIL_PORT }}" > backend/secrets/email_port.txt
-          echo "${{ secrets.EMAIL_HOST_USER }}" > backend/secrets/email_host_user.txt
-          echo "${{ secrets.EMAIL_HOST_PASSWORD }}" > backend/secrets/email_host_password.txt
-          echo "${{ secrets.EMAIL_USE_TLS }}" > backend/secrets/email_use_tls.txt
-          echo "${{ secrets.DEFAULT_FROM_EMAIL }}" > backend/secrets/default_from_email.txt
+          .github/scripts/cleanup-swarm.sh "${{ env.SERVICE_NAME }}" "${{ env.STACK_NAME }}"
+          .github/scripts/cleanup-docker.sh "${{ env.DOCKER_IMAGE }}"
+          echo "Ressources Docker nettoyées."
+
+  secrets:
+    runs-on: self-hosted
+    needs: init-docker
+    steps:
+      - name: Initialize docker swarm
+        run: |
+          .github/scripts/init-swarm.sh
+
+      - name: Create Docker secrets
+        run: |
+          echo "Création des secrets Docker..."
+          for secret in SECRET_KEY DB_USER DB_PASSWORD DB_NAME DB_HOST ALLOWED_HOSTS CORS_ALLOWED_ORIGINS SENTRY_DSN EMAIL_HOST EMAIL_PORT EMAIL_HOST_USER EMAIL_HOST_PASSWORD EMAIL_USE_TLS DEFAULT_FROM_EMAIL; do
+            # The image uses the secrets names in lowercase
+            lowercase_secret=$(echo "$secret" | tr '[:upper:]' '[:lower:]')
+            echo "${!secret}" | docker secret create "$lowercase_secret" -
+          done
+          .github/scripts/check-secrets.sh
+
+  build-image:
+    runs-on: self-hosted
+    needs: [init-project, secrets]
+    steps:
+      - name: Create temporary directory for secrets
+        run: |
+          echo "SECRETS_DIR='${{ env.WORK_PATH  }}/secrets'" > $GITHUB_ENV
+          .github/scripts/create-dir.sh "$SECRETS_DIR" "secrets"
+
+      - name: Write secret to temporary file
+        run: |
+          echo "Écriture de la clé secrète dans le fichier temporaire..."
+          SECRET_FILE="$SECRETS_DIR/secret_key.txt"
+          echo "${{ secrets.SECRET_KEY }}" > "$SECRET_FILE" || (echo "Erreur lors de l'écriture de la clé secrète dans le fichier." && exit 1)
+          chmod 600 "$SECRET_FILE"
+          .github/scripts/check-file-creation.sh "$SECRET_FILE" "secret_key.txt"
 
       - name: Build Docker image
         run: |
-          DOCKER_BUILDKIT=1 docker build \
-            --build-arg ENV=prod \
-            --build-arg DEBUG=false \
-            --secret id=secret_key,src=backend/secrets/secret_key.txt \
-            -t tixidest/ogtickets-backend:latest \
-            -f backend/Dockerfile backend
+          .github/scripts/build-image.sh "${{ env.DOCKER_IMAGE }}" "$SECRET_FILE"
 
-      - name: Run backend tests
+  tests:
+    runs-on: self-hosted
+    needs: build-image
+    steps:
+      - name: Run tests
+        working-directory: ${{ env.WORK_PATH }}
         run: |
-          docker compose --file backend/compose.test.yaml up \
-            --exit-code-from backend \
+          echo "Lancement des tests..."
+          docker compose --file compose.test.yaml up \
+            --exit-code-from test \
             --abort-on-container-exit
 
-      - name: Cleanup Docker
+      - name: Cleanup Docker resources after tests
         run: |
-          docker compose --file backend/compose.test.yaml down --volumes --remove-orphans
+          .github/scripts/cleanup-docker.sh "${{ env.DOCKER_IMAGE }}"
+          echo "Ressources Docker nettoyées après les tests."
 
-      - name: Deploy to production
+  deploy:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ${{ env.WORK_PATH }}
+    needs: [secrets, tests]
+    steps:
+      - name: Deploy docker stack
+        run: docker stack deploy -c stack.yaml ${{ env.STACK_NAME }}
+
+      - name: Check service status
         run: |
-          if docker service inspect ogtickets_backend_backend &> /dev/null; then
-            echo "Mise à l'échelle du service existant à 0..."
-            docker service scale ogtickets_backend_backend=0
-            echo "Attente de 20 secondes pour que le service s'arrête..."
-            sleep 20
-          fi
-          if docker stack ls | grep -q ogtickets_backend; then
-            echo "Suppression de l'ancienne stack..."
-            docker stack rm ogtickets_backend
-            echo "Attente de 20 secondes pour que la suppression soit effective..."
-            sleep 20
-          fi
-          echo "Mise à jour du dépôt sur l'instance..."
-          cd /home/ubuntu/og-tickets/ && git pull origin main
-          echo "Pull de la nouvelle image depuis Docker Hub..."
-          docker pull tixidest/ogtickets-backend:latest
-          echo "Suppression des anciens secrets Docker..."
-          for secret in $(docker secret ls --format "{{.Name}}"); do
-            docker secret rm "$secret"
-          done
-          echo "Création des secrets Docker..."
-          docker secret create secret_key backend/secrets/secret_key.txt
-          docker secret create db_user backend/secrets/db_user.txt
-          docker secret create db_password backend/secrets/db_password.txt
-          docker secret create db_name backend/secrets/db_name.txt
-          docker secret create db_host backend/secrets/db_host.txt
-          docker secret create allowed_hosts backend/secrets/allowed_hosts.txt
-          docker secret create cors_allowed_origins backend/secrets/cors_allowed_origins.txt
-          docker secret create sentry_dsn backend/secrets/sentry_dsn.txt
-          docker secret create email_host backend/secrets/email_host.txt
-          docker secret create email_port backend/secrets/email_port.txt
-          docker secret create email_host_user backend/secrets/email_host_user.txt
-          docker secret create email_host_password backend/secrets/email_host_password.txt
-          docker secret create email_use_tls backend/secrets/email_use_tls.txt
-          docker secret create default_from_email backend/secrets/default_from_email.txt
-          echo "Déploiement de la nouvelle stack..."
-          docker stack deploy -c backend/stack.yaml ogtickets_backend
+          .github/scripts/check-service-status.sh "${{ env.SERVICE_NAME }}" "${{ env.TIMEOUT }}"
+
+      - name: Generate failure report
+        if: failure()
+        run: |
+          echo "Le déploiement a échoué. Logs du service :" > failure-report.txt
+          docker service logs "${{ env.SERVICE_NAME }}" >> failure-report.txt
+          echo "Statut du service :" >> failure-report.txt
+          docker service ps --no-trunc "${{ env.SERVICE_NAME }}" >> failure-report.txt
+
+      - name: Upload failure report as artifact
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: failure-report
+          path: failure-report.txt
