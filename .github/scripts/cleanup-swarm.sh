@@ -3,18 +3,6 @@
 # Enable strict mode: exit on error, undefined variables, and pipeline failures
 set -euo pipefail
 
-SERVICE_NAME=${1:-""}
-STACK_NAME=${2:-""}
-
-if [ -z "$SERVICE_NAME" ]; then
-  echo "Erreur : Le nom du service (SERVICE_NAME) n'est pas spécifié."
-  exit 1
-fi
-if [ -z "$STACK_NAME" ]; then
-  echo "Erreur : Le nom de la pile (STACK_NAME) n'est pas spécifié."
-  exit 1
-fi
-
 # Function to wait for a resource to be deleted
 wait_for_deletion() {
   local resource_name="$1"
@@ -63,13 +51,13 @@ echo "Nettoyage des ressources Docker swarm..."
 
 # Delete Docker Swarm services
 cleanup_resource "services Docker Swarm" \
-  "docker service inspect $SERVICE_NAME &> /dev/null" \
-  "docker service rm $SERVICE_NAME"
+  "docker service ls -q" \
+  "docker service rm \$(docker service ls -q)"
 
-# Delete Docker Swarm stack
-cleanup_resource "stack Docker Swarm" \
-  "docker stack ls | grep -q $STACK_NAME" \
-  "docker stack rm $STACK_NAME"
+# Delete Docker Swarm stacks
+cleanup_resource "stacks Docker Swarm" \
+  "docker stack ls --format '{{.Name}}'" \
+  "docker stack rm \$(docker stack ls --format '{{.Name}}')"
 
 # Delete Docker secrets
 echo "Suppression des secrets Docker..."

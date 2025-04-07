@@ -74,7 +74,7 @@ jobs:
 
       - name: Clean up Docker resources
         run: |
-          .github/scripts/cleanup-swarm.sh "${{ env.SERVICE_NAME }}" "${{ env.STACK_NAME }}"
+          .github/scripts/cleanup-swarm.sh
           .github/scripts/cleanup-docker.sh "${{ env.DOCKER_IMAGE }}"
           echo "Ressources Docker nettoyées."
 
