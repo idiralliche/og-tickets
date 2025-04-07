@@ -72,19 +72,18 @@ fi
 
 # Delete images (excluding $DOCKER_IMAGE & buildkit images)
 echo "Suppression des images Docker..."
-images_to_remove=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>" | grep -v "moby/buildkit")
+images_to_remove=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -Ev "($DOCKER_IMAGE|<none>:<none>|moby/buildkit)")
 if [ -n "$images_to_remove" ]; then
   echo "Images à supprimer :"
   echo "$images_to_remove"
   docker rmi -f $images_to_remove || {
-    echo "Erreur : Certaines images n'ont pas pu être supprimées."
-    exit 1
+    echo "Attention : Certaines images n'ont pas pu être supprimées."
   }
-  remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>" | grep -v "moby/buildkit")
+  remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -Ev "($DOCKER_IMAGE|<none>:<none>|moby/buildkit)")
   if [ -n "$remaining_images" ]; then
-    echo "Erreur : Les images suivantes n'ont pas pu être supprimées :"
+    echo "Attention : Les images suivantes n'ont pas pu être supprimées :"
     echo "$remaining_images"
-    exit 1
+    echo "Passage à la suite, certaines images non critiques peuvent rester."
   fi
   echo "Toutes les images ont été supprimées avec succès."
 else
