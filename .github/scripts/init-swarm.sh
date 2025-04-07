@@ -31,5 +31,3 @@ init_docker_swarm() {
   echo "Docker Swarm initialisé avec succès."
 }
 init_docker_swarm
-
-
