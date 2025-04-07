@@ -14,7 +14,7 @@ fi
 check_resource() {
   local resource_name="$1"
   local check_command="$2"
-  if $list_command | grep -q .; then
+  if $check_command | grep -q .; then
     echo "Erreur : La ressource '$resource_name' n'a pas été supprimée."
     exit 1
   fi
@@ -50,7 +50,7 @@ echo "Nettoyage des ressources Docker..."
 
 # Stop and delete containers (excluding Swarm ones)
 echo "Nettoyage des conteneurs..."
-containers=$(docker ps -aq --filter 'label!=com.docker.swarm.service.id')
+containers=$(docker ps -aq --filter 'label=com.docker.swarm.service.id' --format "{{.ID}}")
 if [ -n "$containers" ]; then
   echo "Arrêt des conteneurs..."
   docker stop $containers || {
@@ -65,13 +65,14 @@ if [ -n "$containers" ]; then
   }
 
   # Verify deletion
-  check_resource "conteneurs" "docker ps -aq --filter 'label!=com.docker.swarm.service.id'"
+  check_resource "conteneurs" "docker ps -aq --filter 'label=com.docker.swarm.service.id' --format '{{.ID}}'"
 else
   echo "Aucun conteneur à supprimer."
 fi
 
 # Delete images (excluding $DOCKER_IMAGE)
-images_to_remove=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE")
+echo "Suppression des images Docker..."
+images_to_remove=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>")
 if [ -n "$images_to_remove" ]; then
   echo "Images à supprimer :"
   echo "$images_to_remove"
@@ -79,7 +80,7 @@ if [ -n "$images_to_remove" ]; then
     echo "Erreur : Certaines images n'ont pas pu être supprimées."
     exit 1
   }
-  remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE")
+  remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>")
   if [ -n "$remaining_images" ]; then
     echo "Erreur : Les images suivantes n'ont pas pu être supprimées :"
     echo "$remaining_images"
