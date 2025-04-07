@@ -71,14 +71,24 @@ else
 fi
 
 # Delete images (excluding $DOCKER_IMAGE)
+echo "Suppression des images Docker..."
+# List all images except the current one ($DOCKER_IMAGE) and ignore invalid formats like <none>:<none>
 images_to_remove=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>")
 if [ -n "$images_to_remove" ]; then
   echo "Images à supprimer :"
   echo "$images_to_remove"
-  docker rmi -f $images_to_remove || {
-    echo "Erreur : Certaines images n'ont pas pu être supprimées."
-    exit 1
-  }
+  # Loop through each image and attempt to remove it
+  for image in $images_to_remove; do
+    echo "Suppression de l'image : $image"
+    if docker inspect "$image" &> /dev/null; then
+      docker rmi -f "$image" || {
+        echo "Erreur : Impossible de supprimer l'image '$image'. Elle est peut-être utilisée par un conteneur."
+      }
+    else
+      echo "Erreur : L'image '$image' n'existe pas."
+    fi
+  done
+  # Verify deletion
   remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "$DOCKER_IMAGE" | grep -v "<none>:<none>")
   if [ -n "$remaining_images" ]; then
     echo "Erreur : Les images suivantes n'ont pas pu être supprimées :"
