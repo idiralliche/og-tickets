@@ -50,7 +50,7 @@ echo "Nettoyage des ressources Docker..."
 
 # Stop and delete containers (excluding Swarm ones)
 echo "Nettoyage des conteneurs..."
-containers=$(docker ps -aq --filter 'label!=com.docker.swarm.service.id')
+containers=$(docker ps -aq --filter "label=com.docker.swarm.service.id" --format "{{.ID}}")
 if [ -n "$containers" ]; then
   echo "Arrêt des conteneurs..."
   docker stop $containers || {
@@ -65,7 +65,7 @@ if [ -n "$containers" ]; then
   }
 
   # Verify deletion
-  check_resource "conteneurs" "docker ps -aq --filter 'label!=com.docker.swarm.service.id'"
+  check_resource "conteneurs" "docker ps -aq --filter 'label=com.docker.swarm.service.id'"
 else
   echo "Aucun conteneur à supprimer."
 fi
