@@ -25,7 +25,7 @@ services:
       - db
     networks:
       - test_net
-    command: python manage.py test
+    command: sh start-test.sh
 
 networks:
   test_net:
