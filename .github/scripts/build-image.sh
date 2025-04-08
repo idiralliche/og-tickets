@@ -43,10 +43,9 @@ DOCKER_BUILDKIT=1 docker build \
 
 # Verify the image was built successfully and wait for it to be available
 echo "Attente de la disponibilité de l'image Docker '$DOCKER_IMAGE'..."
-max_attempts=6
+max_attempts=12
 attempt=1
 
-sleep 60
 while [ $attempt -le $max_attempts ]; do
   if docker images | grep -q "$DOCKER_IMAGE"; then
     echo "L'image Docker '$DOCKER_IMAGE' est disponible."
