@@ -129,12 +129,15 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
+      - name: Cleanup previous Docker Compose environment
+        run: docker compose --file compose.test.yaml down --remove-orphans
+
       - name: Run tests
         working-directory: ${{ env.WORK_PATH }}
         run: |
           echo "Lancement des tests..."
           docker compose --file compose.test.yaml up \
-            --exit-code-from backend \
+            --exit-code-from test \
             --abort-on-container-exit
 
       - name: Cleanup Docker resources after tests
