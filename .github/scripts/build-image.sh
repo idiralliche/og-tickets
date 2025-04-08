@@ -41,24 +41,39 @@ DOCKER_BUILDKIT=1 docker build \
   exit 1
 }
 
-# Verify the image was built successfully
-if ! docker images | grep -q "$DOCKER_IMAGE"; then
-  echo "Erreur : L'image Docker '$DOCKER_IMAGE' n'a pas été construite avec succès."
+# Verify the image was built successfully and wait for it to be available
+echo "Attente de la disponibilité de l'image Docker '$DOCKER_IMAGE'..."
+max_attempts=6
+attempt=1
+
+sleep 60
+while [ $attempt -le $max_attempts ]; do
+  if docker images | grep -q "$DOCKER_IMAGE"; then
+    echo "L'image Docker '$DOCKER_IMAGE' est disponible."
+    break
+  fi
+  echo "Image non trouvée. Nouvelle tentative... ($attempt/$max_attempts)"
+  sleep 10
+  attempt=$((attempt + 1))
+done
+
+if [ $attempt -gt $max_attempts ]; then
+  echo "Erreur : L'image Docker '$DOCKER_IMAGE' n'a pas été trouvée après plusieurs tentatives."
   exit 1
 fi
-echo "Image Docker '$DOCKER_IMAGE' construite avec succès."
-# Verify the image is not empty
+
+echo "Vérification de la taille de l'image..."
 if [ "$(docker inspect -f '{{.Size}}' "$DOCKER_IMAGE")" -eq 0 ]; then
   echo "Erreur : L'image Docker '$DOCKER_IMAGE' est vide."
   exit 1
 fi
-echo "L'image Docker '$DOCKER_IMAGE' n'est pas vide."
+echo "L'image Docker '$DOCKER_IMAGE' a été construite avec succès et n'est pas vide."
 
-rm -f "$SECRET_FILE" || (
+rm -f "$SECRET_FILE" || {
   echo "Erreur : Impossible de supprimer le fichier secret."
   exit 1
-)
-# Verify the file was deleted
+}
+# Vérifier que le fichier secret a bien été supprimé
 if [ -f "$SECRET_FILE" ]; then
   echo "Erreur : Le fichier secret n'a pas été supprimé."
   exit 1
