@@ -129,7 +129,7 @@ jobs:
         run: |
           echo "Lancement des tests..."
           docker compose --file compose.test.yaml up \
-            --exit-code-from test \
+            --exit-code-from backend \
             --abort-on-container-exit
 
       - name: Cleanup Docker resources after tests
