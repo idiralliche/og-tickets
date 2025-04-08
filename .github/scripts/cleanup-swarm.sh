@@ -3,76 +3,48 @@
 # Enable strict mode: exit on error, undefined variables, and pipeline failures
 set -euo pipefail
 
-# Function to wait for a resource to be deleted
-wait_for_deletion() {
-  local resource_name="$1"
-  local check_command="$2"
-  local timeout=60
-  local elapsed=0
+# Check if swarm is active
+SWARM_STATE=$(docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null || echo "inactive")
+if [[ "$SWARM_STATE" != "active" ]]; then
+  echo "Ce node n'est pas en mode swarm manager. Passage du nettoyage des ressources Docker Swarm."
+  exit 0
+fi
 
-  echo "Attente de la suppression de '$resource_name'..."
-  while $check_command | grep -q .; do
-    if [ $elapsed -ge $timeout ]; then
-      echo "Erreur : La suppression de '$resource_name' a dépassé le délai d'attente."
-      exit 1
-    fi
-
-    echo "En cours... ($elapsed/$timeout secondes)"
-    sleep 5
-    elapsed=$((elapsed + 5))
-  done
-
-  echo "'$resource_name' a été supprimé avec succès."
-}
-
-# Delete Docker Swarm services
-cleanup_resource() {
-  local resource_type="$1"
-  local list_command="$2"
-  local delete_command="$3"
-
-  echo "Suppression des $resource_type..."
-  if ! $list_command | grep -q .; then
-    echo "Aucun $resource_type à supprimer."
-    return
-  fi
-
-  # Delete the resource
-  $delete_command || {
-    echo "Erreur lors de la suppression des $resource_type."
-    exit 1
-  }
-
-  # Wait for deletion
-  wait_for_deletion "$resource_type" "$list_command"
-}
-
+# Cleanup Docker Swarm resources
 echo "Nettoyage des ressources Docker swarm..."
 
 # Delete Docker Swarm services
-cleanup_resource "services Docker Swarm" \
-  "docker service ls -q" \
-  "docker service rm \$(docker service ls -q)"
+echo "Suppression des services Docker Swarm..."
+if docker service ls -q | grep -q .; then
+  docker service rm $(docker service ls -q) || {
+    echo "Erreur lors de la suppression des services Docker Swarm."
+    exit 1
+  }
+  echo "Services Docker Swarm supprimés avec succès."
+else
+  echo "Aucun service Docker Swarm à supprimer."
+fi
 
 # Delete Docker Swarm stacks
-cleanup_resource "stacks Docker Swarm" \
-  "docker stack ls --format '{{.Name}}'" \
-  "docker stack rm \$(docker stack ls --format '{{.Name}}')"
+echo "Suppression des stacks Docker Swarm..."
+if docker stack ls --format '{{.Name}}' | grep -q .; then
+  docker stack rm $(docker stack ls --format '{{.Name}}') || {
+    echo "Erreur lors de la suppression des stacks Docker Swarm."
+    exit 1
+  }
+  echo "Stacks Docker Swarm supprimés avec succès."
+else
+  echo "Aucune stack Docker Swarm à supprimer."
+fi
 
 # Delete Docker secrets
 echo "Suppression des secrets Docker..."
 if docker secret ls -q | grep -q .; then
   docker secret rm $(docker secret ls -q) || {
-    echo "Erreur : Échec de la suppression des secrets Docker."
+    echo "Erreur lors de la suppression des secrets Docker."
     exit 1
   }
-
-  # Verify deletion
-  if docker secret ls -q | grep -q .; then
-    echo "Erreur : Certains secrets Docker n'ont pas pu être supprimés."
-    exit 1
-  fi
-  echo "Tous les secrets Docker ont été supprimés avec succès."
+  echo "Secrets Docker supprimés avec succès."
 else
   echo "Aucun secret Docker à supprimer."
 fi
