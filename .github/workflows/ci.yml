@@ -75,7 +75,7 @@ jobs:
       - name: Clean up Docker resources
         run: |
           .github/scripts/cleanup-swarm.sh
-          .github/scripts/cleanup-docker.sh "${{ env.DOCKER_IMAGE }}"
+          .github/scripts/cleanup-docker.sh "${DOCKER_IMAGE}"
           echo "Ressources Docker nettoyées."
 
   secrets:
@@ -102,20 +102,22 @@ jobs:
     steps:
       - name: Create temporary directory for secrets
         run: |
-          echo "SECRETS_DIR='${{ env.WORK_PATH  }}/secrets'" > $GITHUB_ENV
+          export SECRETS_DIR=${WORK_PATH}/secrets
+          echo "SECRETS_DIR=$SECRETS_DIR" >> $GITHUB_ENV
           .github/scripts/create-dir.sh "$SECRETS_DIR" "secrets"
 
       - name: Write secret to temporary file
         run: |
           echo "Écriture de la clé secrète dans le fichier temporaire..."
-          SECRET_FILE="$SECRETS_DIR/secret_key.txt"
+          export SECRET_FILE=${SECRETS_DIR}/secret_key.txt
+          echo "SECRET_FILE=$SECRET_FILE" >> $GITHUB_ENV
           echo "${{ secrets.SECRET_KEY }}" > "$SECRET_FILE" || (echo "Erreur lors de l'écriture de la clé secrète dans le fichier." && exit 1)
           chmod 600 "$SECRET_FILE"
           .github/scripts/check-file-creation.sh "$SECRET_FILE" "secret_key.txt"
 
       - name: Build Docker image
         run: |
-          .github/scripts/build-image.sh "${{ env.DOCKER_IMAGE }}" "$SECRET_FILE"
+          .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_FILE}"
 
   tests:
     runs-on: self-hosted
@@ -131,7 +133,7 @@ jobs:
 
       - name: Cleanup Docker resources after tests
         run: |
-          .github/scripts/cleanup-docker.sh "${{ env.DOCKER_IMAGE }}"
+          .github/scripts/cleanup-docker.sh "${DOCKER_IMAGE}"
           echo "Ressources Docker nettoyées après les tests."
 
   deploy:
@@ -142,19 +144,19 @@ jobs:
     needs: [secrets, tests]
     steps:
       - name: Deploy docker stack
-        run: docker stack deploy -c stack.yaml ${{ env.STACK_NAME }}
+        run: docker stack deploy -c stack.yaml ${STACK_NAME}
 
       - name: Check service status
         run: |
-          .github/scripts/check-service-status.sh "${{ env.SERVICE_NAME }}" "${{ env.TIMEOUT }}"
+          .github/scripts/check-service-status.sh "${SERVICE_NAME}" "${TIMEOUT}"
 
       - name: Generate failure report
         if: failure()
         run: |
           echo "Le déploiement a échoué. Logs du service :" > failure-report.txt
-          docker service logs "${{ env.SERVICE_NAME }}" >> failure-report.txt
+          docker service logs "${SERVICE_NAME}" >> failure-report.txt
           echo "Statut du service :" >> failure-report.txt
-          docker service ps --no-trunc "${{ env.SERVICE_NAME }}" >> failure-report.txt
+          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt
 
       - name: Upload failure report as artifact
         if: failure()
