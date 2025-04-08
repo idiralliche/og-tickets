@@ -36,7 +36,7 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg DEBUG=false \
   --secret id=secret_key,src=$SECRET_FILE \
   -t "$DOCKER_IMAGE" \
-  -f Dockerfile "$WORK_PATH" || {
+  -f "${WORK_PATH}/Dockerfile" "$WORK_PATH" || {
   echo "Erreur : La construction de l'image Docker '$DOCKER_IMAGE' a échoué."
   exit 1
 }
