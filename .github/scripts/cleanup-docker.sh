@@ -120,8 +120,8 @@ if [ -z "$networks_full" ]; then
   echo "Aucun réseau n'a été trouvé."
  prompt_decision
 else
-  networks_to_remove=$(echo "$networks_full" | grep -Ev '\s+(bridge|host|none|docker_gwbridge)$' | awk '{print $1}' || true)
-  if [ -z "$networks_to_remove" ]; then
+  networks_to_remove=$(echo "$networks_full" | grep -Ev '\s+(bridge|host|none|docker_gwbridge|ingress)$' | awk '{print $1}' || true)
+    if [ -z "$networks_to_remove" ]; then
     echo "Aucun réseau à supprimer."
   else
     echo "Réseaux à supprimer:"
@@ -129,7 +129,7 @@ else
     docker network rm $networks_to_remove
 
     # Verify deletion
-    remaining_networks=$(docker network ls --format "{{.ID}} {{.Name}}" | grep -Ev '\s+(bridge|host|none|docker_gwbridge)$' | awk '{print $1}' || true)
+    remaining_networks=$(docker network ls --format "{{.ID}} {{.Name}}" | grep -Ev '\s+(bridge|host|none|docker_gwbridge|ingress)$' | awk '{print $1}' || true)
     if [ -n "$remaining_networks" ]; then
       echo "Attention : certains réseaux suivants n'ont pas été supprimés :"
       echo "$remaining_networks"
