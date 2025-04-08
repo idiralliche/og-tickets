@@ -117,7 +117,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_FILE}"
+          .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_FILE}" "${WORK_PATH}"
+          rmdir ${SECRETS_DIR} || echo "Le répertoire ${SECRETS_DIR} n'existe pas ou n'a pas pu être supprimé."
 
   tests:
     runs-on: self-hosted
