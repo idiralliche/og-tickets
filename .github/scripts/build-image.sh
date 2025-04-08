@@ -5,6 +5,7 @@ set -euo pipefail
 
 DOCKER_IMAGE=${1:-""}
 SECRET_FILE=${2:-""}
+WORK_PATH=${3:-""}
 
 # Check if the Docker image name is provided
 if [[ -z "$DOCKER_IMAGE" ]]; then
@@ -16,6 +17,16 @@ if [[ -z "$SECRET_FILE" ]]; then
   echo "Erreur : Le chemin du fichier secret (SECRET_FILE) n'est pas spécifié."
   exit 1
 fi
+# Check if the working directory is provided
+if [[ -z "$WORK_PATH" ]]; then
+  echo "Erreur : Le répertoire de travail (WORK_PATH) n'est pas spécifié."
+  exit 1
+fi
+# Check if the working directory exists
+if [[ ! -d "$WORK_PATH" ]]; then
+  echo "Erreur : Le répertoire de travail '$WORK_PATH' n'existe pas."
+  exit 1
+fi
 
 
 # Build the Docker image
@@ -25,7 +36,10 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg DEBUG=false \
   --secret id=secret_key,src=$SECRET_FILE \
   -t "$DOCKER_IMAGE" \
-  -f Dockerfile .
+  -f Dockerfile "$WORK_PATH" || {
+  echo "Erreur : La construction de l'image Docker '$DOCKER_IMAGE' a échoué."
+  exit 1
+}
 
 # Verify the image was built successfully
 if ! docker images | grep -q "$DOCKER_IMAGE"; then
@@ -50,5 +64,3 @@ if [ -f "$SECRET_FILE" ]; then
   exit 1
 fi
 echo "Fichier secret supprimé avec succès."
-
-rmdir /tmp/secrets || echo "Le répertoire /tmp/secrets n'existe pas ou n'a pas pu être supprimé."
