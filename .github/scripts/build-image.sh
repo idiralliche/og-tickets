@@ -45,9 +45,9 @@ DOCKER_BUILDKIT=1 docker build \
 echo "Attente de la disponibilité de l'image Docker '$DOCKER_IMAGE'..."
 max_attempts=12
 attempt=1
-
 while [ $attempt -le $max_attempts ]; do
-  if docker images | grep -q "$DOCKER_IMAGE"; then
+  # Utiliser --format pour obtenir exactement "Repository:Tag"
+  if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^$DOCKER_IMAGE\$"; then
     echo "L'image Docker '$DOCKER_IMAGE' est disponible."
     break
   fi
