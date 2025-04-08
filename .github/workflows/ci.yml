@@ -130,6 +130,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Cleanup previous Docker Compose environment
+        working-directory: ${{ env.WORK_PATH }}
         run: docker compose --file compose.test.yaml down --remove-orphans
 
       - name: Run tests
