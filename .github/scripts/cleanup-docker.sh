@@ -63,8 +63,6 @@ else
   else
     echo "Attention : les images suivantes n'ont pas pu être supprimées :"
     echo "$remaining_images"
-    # Optionnel : sortir avec une erreur si nécessaire
-    # exit 1
   fi
 fi
 
