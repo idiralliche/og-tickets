@@ -38,34 +38,34 @@ services:
           cpus: '0.1'
           memory: 256M
       labels:
-        - 'org.duckdns.ogtickets.description=Backend service for ogtickets.duckdns.org'
+        - 'space.ogtickets.description=Backend service for ogtickets.space'
 
 secrets:
   secret_key:
-    file: secrets/secret_key.txt
+    external: true
   db_user:
-    file: secrets/db_user.txt
+    external: true
   db_password:
-    file: secrets/db_password.txt
+    external: true
   db_name:
-    file: secrets/db_name.txt
+    external: true
   db_host:
-    file: secrets/db_host.txt
+    external: true
   allowed_hosts:
-    file: secrets/allowed_hosts.txt
+    external: true
   cors_allowed_origins:
-    file: secrets/cors_allowed_origins.txt
+    external: true
   sentry_dsn:
-    file: secrets/sentry_dsn.txt
+    external: true
   email_host:
-    file: secrets/email_host.txt
+    external: true
   email_port:
-    file: secrets/email_port.txt
+    external: true
   email_host_user:
-    file: secrets/email_host_user.txt
+    external: true
   email_host_password:
-    file: secrets/email_host_password.txt
+    external: true
   email_use_tls:
-    file: secrets/email_use_tls.txt
+    external: true
   default_from_email:
-    file: secrets/default_from_email.txt
+    external: true

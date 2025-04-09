@@ -56,7 +56,7 @@ else
   fi
 
   # Verify deletion
-  remaining_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -Ev "($DOCKER_IMAGE|<none>:<none>|moby/buildkit)" || true)
+
   if [ -n "$remaining_images" ]; then
     echo "Attention : les images suivantes n'ont pas pu être supprimées :"
     echo "$remaining_images"
