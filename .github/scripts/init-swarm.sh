@@ -8,11 +8,19 @@ init_docker_swarm() {
   local timeout=60
   local elapsed=0
 
-  # Initialize Docker Swarm
-  echo "Initialisation de Docker Swarm..."
-  if ! docker swarm init &> /dev/null; then
-    echo "Erreur : Échec de l'initialisation de Docker Swarm."
-    exit 1
+  # Check docker swarm state
+  echo "Vérification de l'état de Docker Swarm..."
+  local swarm_state
+  swarm_state=$(docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null || echo "inactive")
+
+  if [ "$swarm_state" = "active" ]; then
+    echo "Le nœud est déjà en mode Swarm actif."
+  else
+    echo "Initialisation de Docker Swarm..."
+    if ! docker swarm init &> /dev/null; then
+      echo "Erreur : Échec de l'initialisation de Docker Swarm."
+      exit 1
+    fi
   fi
 
   # Wait for Docker Swarm to be active
