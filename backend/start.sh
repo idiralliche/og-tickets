@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Enable strict mode: exit on error, undefined variables, and pipeline failures
 set -eu
