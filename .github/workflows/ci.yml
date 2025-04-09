@@ -138,9 +138,9 @@ jobs:
         if: failure()
         run: |
           echo "Le déploiement a échoué. Logs du service :" > failure-report.txt
-          docker service logs "${SERVICE_NAME}" >> failure-report.txt
+          docker service logs "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun log trouvé." >> failure-report.txt
           echo "Statut du service :" >> failure-report.txt
-          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt
+          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun ps trouvé." >> failure-report.txt
 
       - name: Upload failure report as artifact
         if: failure()
