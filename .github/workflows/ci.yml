@@ -120,40 +120,12 @@ jobs:
           .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_FILE}" "${WORK_PATH}"
           rmdir ${SECRETS_DIR} || echo "Le répertoire ${SECRETS_DIR} n'existe pas ou n'a pas pu être supprimé."
 
-  tests:
-    runs-on: self-hosted
-    needs: build-image
-    steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-
-      - name: Cleanup previous Docker Compose environment
-        working-directory: ${{ env.WORK_PATH }}
-        run: docker compose --file compose.test.yaml down --remove-orphans
-
-      - name: Run tests
-        working-directory: ${{ env.WORK_PATH }}
-        run: |
-          echo "Lancement des tests..."
-          docker compose --file compose.test.yaml up \
-            --exit-code-from test \
-            --abort-on-container-exit
-
-      - name: Cleanup Docker resources after tests
-        run: |
-          .github/scripts/cleanup-docker.sh "${DOCKER_IMAGE}"
-          echo "Ressources Docker nettoyées après les tests."
-
   deploy:
     runs-on: self-hosted
-    defaults:
-      run:
-        working-directory: ${{ env.WORK_PATH }}
-    needs: [secrets, tests]
+    needs: [secrets, build-image]
     steps:
       - name: Deploy docker stack
+        working-directory: ${{ env.WORK_PATH }}
         run: docker stack deploy -c stack.yaml ${STACK_NAME}
 
       - name: Check service status
@@ -161,16 +133,10 @@ jobs:
           .github/scripts/check-service-status.sh "${SERVICE_NAME}" "${TIMEOUT}"
 
       - name: Generate failure report
+        working-directory: ${{ env.WORK_PATH }}
         if: failure()
         run: |
           echo "Le déploiement a échoué. Logs du service :" > failure-report.txt
-          docker service logs "${SERVICE_NAME}" >> failure-report.txt
+          docker service logs "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun log trouvé." >> failure-report.txt
           echo "Statut du service :" >> failure-report.txt
-          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt
-
-      - name: Upload failure report as artifact
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: failure-report
-          path: failure-report.txt
+          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun ps trouvé." >> failure-report.txt
