@@ -125,16 +125,18 @@ jobs:
     needs: [secrets, build-image]
     steps:
       - name: Deploy docker stack
-        run: docker stack deploy -c ${WORK_PATH }/stack.yaml ${STACK_NAME}
+        working-directory: ${{ env.WORK_PATH }}
+        run: docker stack deploy -c stack.yaml ${STACK_NAME}
 
       - name: Check service status
         run: |
           .github/scripts/check-service-status.sh "${SERVICE_NAME}" "${TIMEOUT}"
 
       - name: Generate failure report
+        working-directory: ${{ env.WORK_PATH }}
         if: failure()
         run: |
-          echo "Le déploiement a échoué. Logs du service :" > ${WORK_PATH }/failure-report.txt
-          docker service logs "${SERVICE_NAME}" >> ${WORK_PATH }/failure-report.txt || echo "Aucun log trouvé." >> ${WORK_PATH }/failure-report.txt
-          echo "Statut du service :" >> ${WORK_PATH }/failure-report.txt
-          docker service ps --no-trunc "${SERVICE_NAME}" >> ${WORK_PATH }/failure-report.txt || echo "Aucun ps trouvé." >> ${WORK_PATH }/failure-report.txt
+          echo "Le déploiement a échoué. Logs du service :" > failure-report.txt
+          docker service logs "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun log trouvé." >> failure-report.txt
+          echo "Statut du service :" >> failure-report.txt
+          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun ps trouvé." >> failure-report.txt
