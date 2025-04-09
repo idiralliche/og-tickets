@@ -125,7 +125,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ env.WORK_PATH }}
-    needs: secrets
+    needs: [secrets, build-image]
     steps:
       - name: Deploy docker stack
         run: docker stack deploy -c stack.yaml ${STACK_NAME}
