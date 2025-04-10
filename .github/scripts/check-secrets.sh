@@ -11,19 +11,25 @@ readonly SECRETS=(
 )
 
 # Function to verify all secrets exist
-verify_secrets() {
-  local missing_secrets=()
+check_secrets() {
+  local missing_secrets=0
 
   echo "Vérification de l'existence des secrets Docker..."
   for secret in "${SECRETS[@]}"; do
-    if ! docker secret inspect "$secret" &> /dev/null; then
-      missing_secrets+=("$secret")
+    if [ ! -f "/run/secrets/$secret" ]; then
+      echo "Erreur : Le secret '$secret' est manquant (fichier non trouvé)."
+      missing_secrets=1
+      else
+        content=$(cat "/run/secrets/$secret" | tr -d '\n')
+        if [ -z "$content" ]; then
+          echo "Erreur : Le secret '$secret' est vide."
+          missing_secrets=1
+        fi
     fi
   done
 
-  if [ ${#missing_secrets[@]} -ne 0 ]; then
-    echo "Erreur : Les secrets suivants sont manquants :"
-    printf "  - %s\n" "${missing_secrets[@]}"
+  if [ "$missing_secrets" -ne 0 ]; then
+    echo "Des secrets requis sont manquants. Arrêt du script."
     exit 1
   fi
 
@@ -31,4 +37,4 @@ verify_secrets() {
 }
 
 # Main script execution
-verify_secrets
+check_secrets
