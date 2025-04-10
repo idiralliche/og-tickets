@@ -28,18 +28,27 @@ if [[ ! -d "$WORK_PATH" ]]; then
   exit 1
 fi
 
+# check if the image already exists
+echo "Vérification de l'existence de l'image Docker '$DOCKER_IMAGE'..."
+if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^$DOCKER_IMAGE\$"; then
+    echo "L'image Docker '$DOCKER_IMAGE' existe déjà. Arrêt de la construction."
+    exit 0
+fi
 
 # Build the Docker image
 echo "Construction de l'image Docker '$DOCKER_IMAGE'..."
-DOCKER_BUILDKIT=1 docker build \
+
+# Set Docker BuildKit to true
+DOCKER_BUILDKIT=1
+if ! timeout 300 docker build \
   --build-arg ENV=prod \
   --build-arg DEBUG=false \
   --secret id=secret_key,src=$SECRET_FILE \
   -t "$DOCKER_IMAGE" \
-  -f "${WORK_PATH}/Dockerfile" "$WORK_PATH" || {
+  -f "${WORK_PATH}/Dockerfile" "$WORK_PATH";then
   echo "Erreur : La construction de l'image Docker '$DOCKER_IMAGE' a échoué."
   exit 1
-}
+fi
 
 # Verify the image was built successfully and wait for it to be available
 echo "Attente de la disponibilité de l'image Docker '$DOCKER_IMAGE'..."
