@@ -11,7 +11,7 @@ wait_for_db() {
   local elapsed=0
 
   if [ -z "$db_host" ] || [ -z "$db_port" ]; then
-    echo "Erreur : DB_HOST ou DATABASE_PORT n'est pas défini."
+    echo "Erreur : DB_HOST ou DB_PORT n'est pas défini."
     exit 1
   fi
 
@@ -32,7 +32,7 @@ wait_for_db() {
 }
 
 # On attend que la base de données soit prête avant de lancer les tests.
-wait_for_db "$DB_HOST" "${DATABASE_PORT:-5432}"
+wait_for_db "$DB_HOST" "${DB_PORT:-5432}"
 
 # Une fois la base de données prête, on lance les tests.
 echo "Lancement des tests..."

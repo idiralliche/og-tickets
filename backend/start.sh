@@ -46,7 +46,7 @@ wait_for_db() {
   elapsed=0
 
   if [ -z "$db_host" ] || [ -z "$db_port" ]; then
-    echo "Erreur : DB_HOST ou DATABASE_PORT n'est pas défini."
+    echo "Erreur : DB_HOST ou DB n'est pas défini."
     exit 1
   fi
 
@@ -65,7 +65,7 @@ wait_for_db() {
 }
 
 # Wait for the database to be ready
-wait_for_db "$DB_HOST" "${DATABASE_PORT:-5432}"
+wait_for_db "$DB_HOST" "${DB_PORT:-5432}"
 
 # Function to apply migrations
 apply_migrations() {
