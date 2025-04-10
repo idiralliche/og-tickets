@@ -11,8 +11,14 @@ check_secrets() {
   missing_secrets=0
   for secret in $1; do
     if [ ! -f "/run/secrets/$secret" ]; then
-      echo "Erreur : Le secret '$secret' est manquant."
+      echo "Erreur : Le secret '$secret' est manquant (fichier non trouvé)."
       missing_secrets=1
+      else
+        content=$(cat "/run/secrets/$secret" | tr -d '\n')
+        if [ -z "$content" ]; then
+          echo "Erreur : Le secret '$secret' est vide."
+          missing_secrets=1
+        fi
     fi
   done
   if [ "$missing_secrets" -ne 0 ]; then
@@ -29,7 +35,7 @@ check_secrets "$required_secrets"
 for secret in $required_secrets; do
   env_var=$(echo "$secret" | tr '[:lower:]' '[:upper:]')
   value=$(cat "/run/secrets/$secret" | tr -d '\n')
-  export "$env_var=$value"
+  export "$env_var"="$value"
 done
 
 # Function to wait for the database to be ready
