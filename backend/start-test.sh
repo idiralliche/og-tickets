@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Enable strict mode: exit on error
 set -e
