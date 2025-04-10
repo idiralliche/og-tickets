@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-# Enable strict mode: exit on error, undefined variables, and pipeline failures
-set -euo pipefail
+# Enable strict mode: exit on error
+set -e
 
 # Fonction pour attendre que la base de données soit prête
 wait_for_db() {
