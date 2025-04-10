@@ -27,7 +27,7 @@ defaults:
     working-directory: /home/ubuntu/og-tickets
 
 jobs:
-  init-project:
+  deploy:
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -62,9 +62,6 @@ jobs:
           fi
           echo "Le dépôt est valide et prêt à être utilisé."
 
-  init-docker:
-    runs-on: self-hosted
-    steps:
       - name: Check if Docker is set up
         run: |
           .github/scripts/verify-docker.sh
@@ -78,10 +75,6 @@ jobs:
           .github/scripts/cleanup-docker.sh "${DOCKER_IMAGE}"
           echo "Ressources Docker nettoyées."
 
-  secrets:
-    runs-on: self-hosted
-    needs: init-docker
-    steps:
       - name: Initialize docker swarm
         run: |
           .github/scripts/init-swarm.sh
@@ -96,11 +89,6 @@ jobs:
           done
           .github/scripts/check-secrets.sh
 
-  build-image:
-    runs-on: self-hosted
-    timeout-minutes: 10
-    needs: [init-project, secrets]
-    steps:
       - name: Create temporary directory for secrets
         run: |
           export SECRETS_DIR=${WORK_PATH}/secrets
@@ -121,10 +109,6 @@ jobs:
           .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_FILE}" "${WORK_PATH}"
           rmdir ${SECRETS_DIR} || echo "Le répertoire ${SECRETS_DIR} n'existe pas ou n'a pas pu être supprimé."
 
-  deploy:
-    runs-on: self-hosted
-    needs: [secrets, build-image]
-    steps:
       - name: Deploy docker stack
         working-directory: ${{ env.WORK_PATH }}
         run: docker stack deploy -c stack.yaml ${STACK_NAME}
