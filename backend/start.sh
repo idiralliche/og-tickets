@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Enable strict mode: exit on error, undefined variables, and pipeline failures
-set -eu
+# Enable strict mode: exit on error
+set -e
 
 # Function to check if all required secrets are present
 check_secrets() {
