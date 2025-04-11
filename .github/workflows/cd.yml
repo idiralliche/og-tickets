@@ -1,0 +1,141 @@
+name: CD Backend
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  WORK_PATH: '/home/ubuntu/og-tickets/backend'
+  DOCKER_IMAGE: 'tixidest/ogtickets-backend:latest'
+  STACK_NAME: 'ogtickets-backend-stack'
+  SERVICE_NAME: 'ogtickets-backend-stack_backend'
+  TIMEOUT: 120
+
+defaults:
+  run:
+    working-directory: /home/ubuntu/og-tickets
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            backend
+
+      - name: Cache .git directory
+        id: cache-git
+        uses: actions/cache@v3
+        with:
+          path: /home/ubuntu/og-tickets/.git
+          key: git-cache-${{ github.sha }}
+          restore-keys: |
+            git-cache-
+
+      - name: Pull latest version of the repository
+        run: |
+          echo "Mise à jour du dépôt depuis origin/main..."
+          git fetch origin main --depth=1 || (echo "Erreur lors de la récupération des mises à jour depuis origin/main." && exit 1)
+          git reset --hard origin/main || (echo "Erreur lors de la mise à jour du dépôt avec git reset --hard." && exit 1)
+          git read-tree -mu HEAD
+          echo "Dépôt mis à jour avec succès."
+
+      - name: Verify repository state
+        run: |
+          if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+            echo "Erreur : Le dépôt n'est pas valide."
+            exit 1
+          fi
+          echo "Le dépôt est valide et prêt à être utilisé."
+
+      - name: Check if Docker is set up
+        run: |
+          .github/scripts/verify-docker.sh
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Clean up Docker resources
+        run: |
+          .github/scripts/cleanup-swarm.sh
+          .github/scripts/cleanup-docker.sh "${DOCKER_IMAGE}"
+          echo "Ressources Docker nettoyées."
+
+      - name: Initialize docker swarm
+        run: |
+          .github/scripts/init-swarm.sh
+
+      - name: Create Docker secrets
+        shell: bash
+        run: |
+          echo "Création des secrets Docker..."
+          for secret in SECRET_KEY DB_USER DB_PASSWORD DB_NAME DB_HOST ALLOWED_HOSTS CORS_ALLOWED_ORIGINS SENTRY_DSN EMAIL_HOST EMAIL_PORT EMAIL_HOST_USER EMAIL_HOST_PASSWORD EMAIL_USE_TLS DEFAULT_FROM_EMAIL; do
+            # The image uses the secrets names in lowercase
+            lowercase_secret=$(echo "$secret" | tr '[:upper:]' '[:lower:]')
+            echo "${!secret}" | docker secret create "$lowercase_secret" -
+          done
+          .github/scripts/check-secrets.sh
+
+      - name: Create temporary directory for secrets
+        run: |
+          export SECRETS_DIR=${WORK_PATH}/secrets
+          echo "SECRETS_DIR=$SECRETS_DIR" >> $GITHUB_ENV
+          .github/scripts/create-dir.sh "$SECRETS_DIR" "secrets"
+
+      - name: Write secret to temporary file
+        run: |
+          echo "Écriture de la clé secrète dans le fichier temporaire..."
+          export SECRET_FILE=${SECRETS_DIR}/secret_key.txt
+          echo "SECRET_FILE=$SECRET_FILE" >> $GITHUB_ENV
+          echo "${{ secrets.SECRET_KEY }}" > "$SECRET_FILE" || (echo "Erreur lors de l'écriture de la clé secrète dans le fichier." && exit 1)
+          chmod 600 "$SECRET_FILE"
+          .github/scripts/check-file-creation.sh "$SECRET_FILE" "secret_key.txt"
+
+      - name: Build Docker image
+        run: |
+          .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_FILE}" "${WORK_PATH}"
+          rmdir ${SECRETS_DIR} || echo "Le répertoire ${SECRETS_DIR} n'existe pas ou n'a pas pu être supprimé."
+
+      - name: Cleanup previous Docker Compose environment
+        working-directory: ${{ env.WORK_PATH }}
+        run: docker compose --file compose.test.yaml down --remove-orphans
+
+      - name: Run tests
+        working-directory: ${{ env.WORK_PATH }}
+        run: |
+          echo "Lancement des tests..."
+          docker compose --file compose.test.yaml up \
+            --exit-code-from test \
+            --abort-on-container-exit
+
+      - name: Cleanup Docker resources after tests
+        run: |
+          .github/scripts/cleanup-docker.sh "${DOCKER_IMAGE}"
+          echo "Ressources Docker nettoyées après les tests."
+
+      - name: Deploy docker stack
+        working-directory: ${{ env.WORK_PATH }}
+        run: docker stack deploy -c stack.yaml ${STACK_NAME}
+
+      - name: Check service status
+        run: |
+          .github/scripts/check-service-status.sh "${SERVICE_NAME}" "${TIMEOUT}"
+
+      - name: Generate failure report
+        working-directory: ${{ env.WORK_PATH }}
+        if: failure()
+        run: |
+          echo "Le déploiement a échoué. Logs du service :" > failure-report.txt
+          docker service logs "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun log trouvé." >> failure-report.txt
+          echo "Statut du service :" >> failure-report.txt
+          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun ps trouvé." >> failure-report.txt
