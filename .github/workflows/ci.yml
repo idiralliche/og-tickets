@@ -58,21 +58,18 @@ jobs:
 
   init-docker:
     runs-on: self-hosted
-    defaults:
-      run:
-        working-directory: ${{ env.SCRIPTS_PATH }}
     steps:
       - name: Check if Docker is set up
         run: |
-          verify-docker.sh
+          ${SCRIPTS_PATH}/verify-docker.sh
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Clean up Docker resources
         run: |
-          cleanup-swarm.sh
-          cleanup-docker.sh
+          ${SCRIPTS_PATH}/cleanup-swarm.sh
+          ${SCRIPTS_PATH}/cleanup-docker.sh
           echo "Ressources Docker nettoyées."
 
   build-image:
@@ -83,11 +80,10 @@ jobs:
         working-directory: ${{ env.WORK_PATH }}
     steps:
       - name: Create directory for secrets
-        working-directory: ${{ env.SCRIPTS_PATH }}
         run: |
           export SECRETS_DIR=${WORK_PATH}/secrets
           echo "SECRETS_DIR=$SECRETS_DIR" >> $GITHUB_ENV
-          create-dir.sh "$SECRETS_DIR" "secrets"
+          ${SCRIPTS_PATH}/create-dir.sh "$SECRETS_DIR" "secrets"
 
       - name: Write secret to temporary file
         run: |
