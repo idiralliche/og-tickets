@@ -13,7 +13,6 @@ Accédez à l'application déployée sur [https://og-tickets.vercel.app/](https:
   - [Backend et Simulation de Micro-services](#backend-et-simulation-de-micro-services)
 - [Technologies utilisées](#technologies-utilisées)
 - [Mesures de sécurité](#mesures-de-sécurité)
-- [Conclusion](#conclusion)
 
 ---
 
@@ -119,8 +118,3 @@ Cette stratégie de développement renforce la maintenabilité et la testabilit�
 
 - Cloudflare offre une infrastructure DNS résiliente et des fonctionnalités de protection contre les attaques DDoS
 - Les enregistrements DNS sensibles (par exemple, pour le SMTP) sont configurés en mode DNS Only afin d'assurer une communication directe et sécurisée.
-
-## Conclusion
-
-**og-tickets** est un projet de démonstration complet, conçu selon des standards professionnels de développement, de déploiement et de sécurité. L'architecture découplée, l'utilisation de technologies modernes (Docker, Django, React, Cloudflare, Nginx) et la gestion rigoureuse des secrets et des communications sécurisées illustrent l'approche robuste adoptée pour répondre aux exigences du projet.
-Ce projet démontre que l'on peut simuler à moindre coût, (pour un projet personnel avec un objectif de démonstration) une application web sécurisée et scalable, avec un focus sur la séparation des responsabilités entre frontend et backend, une gestion fine des accès et une intégration de solutions de sécurité et de monitoring.
