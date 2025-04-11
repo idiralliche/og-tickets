@@ -109,7 +109,7 @@ jobs:
             echo "Vérification de la création du fichier ${file}.txt..."
             ${SCRIPTS_PATH}/check-file-creation.sh "${SECRETS_DIR}" "${file}.txt"
           done
-          echo "Secrets créés avec succès."
+          echo "Fichiers de secrets créés avec succès."
         shell: bash
 
       - name: Build Docker image
