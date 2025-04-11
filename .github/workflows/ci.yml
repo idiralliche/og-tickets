@@ -155,7 +155,6 @@ jobs:
             --abort-on-container-exit
 
       - name: Cleanup Docker resources after tests
-        working-directory: ${{ env.SCRIPTS_PATH }}
         run: |
-          cleanup-docker.sh
+          ${SCRIPTS_PATH}/cleanup-docker.sh
           echo "Ressources Docker nettoyées après les tests."
