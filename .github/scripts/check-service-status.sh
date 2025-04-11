@@ -16,20 +16,20 @@ for i in $(seq 1 "$TIMEOUT"); do
   STATUS=$(docker service ps --no-trunc "$SERVICE_NAME" --format "{{.CurrentState}}" | head -n 1)
 
   if [[ "$STATUS" == *"Running"* ]]; then
-    echo "true"
+    echo "Le service est en cours d'exécution."
     exit 0
   elif [[ "$STATUS" == *"Failed"* || "$STATUS" == *"Shutdown"* ]]; then
-    echo "false"
+    echo "Le service a échoué ou s'est arrêté."
     docker service ps --no-trunc "$SERVICE_NAME"
     docker service logs "$SERVICE_NAME"
-    exit 0
+    exit 1
   fi
 
   echo "Attente du démarrage du service... ($i/$TIMEOUT)"
   sleep 5
 done
 
-echo "false"
+echo "Timeout atteint : le service n'a pas démarré correctement."
 docker service ps --no-trunc "$SERVICE_NAME"
 docker service logs "$SERVICE_NAME"
-exit 0
+exit 1
