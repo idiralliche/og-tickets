@@ -114,7 +114,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          if ! timeout 300 DOCKER_BUILDKIT=1 docker build \
+          DOCKER_BUILDKIT=1
+          if ! timeout 300 docker build \
           --build-arg ENV=prod \
           --build-arg DEBUG=false \
           --secret id=secret_key,src="${SECRET_KEY_FILE}" \
