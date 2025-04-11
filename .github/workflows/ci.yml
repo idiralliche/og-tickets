@@ -1,33 +1,25 @@
-name: CI/CD Backend Production Deploy
+name: CI Backend
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'backend/**'
   pull_request:
     branches: [main]
     paths:
       - 'backend/**'
 
 permissions:
-  id-token: write
   contents: read
 
 env:
   WORK_PATH: '/home/ubuntu/og-tickets/backend'
   DOCKER_IMAGE: 'tixidest/ogtickets-backend:latest'
-  STACK_NAME: 'ogtickets-backend-stack'
-  SERVICE_NAME: 'ogtickets-backend-stack_backend'
-  TIMEOUT: 120
 
 defaults:
   run:
     working-directory: /home/ubuntu/og-tickets
 
 jobs:
-  deploy:
+  init-project:
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -62,6 +54,9 @@ jobs:
           fi
           echo "Le dépôt est valide et prêt à être utilisé."
 
+  init-docker:
+    runs-on: self-hosted
+    steps:
       - name: Check if Docker is set up
         run: |
           .github/scripts/verify-docker.sh
@@ -72,24 +67,13 @@ jobs:
       - name: Clean up Docker resources
         run: |
           .github/scripts/cleanup-swarm.sh
-          .github/scripts/cleanup-docker.sh "${DOCKER_IMAGE}"
+          .github/scripts/cleanup-docker.sh
           echo "Ressources Docker nettoyées."
 
-      - name: Initialize docker swarm
-        run: |
-          .github/scripts/init-swarm.sh
-
-      - name: Create Docker secrets
-        shell: bash
-        run: |
-          echo "Création des secrets Docker..."
-          for secret in SECRET_KEY DB_USER DB_PASSWORD DB_NAME DB_HOST ALLOWED_HOSTS CORS_ALLOWED_ORIGINS SENTRY_DSN EMAIL_HOST EMAIL_PORT EMAIL_HOST_USER EMAIL_HOST_PASSWORD EMAIL_USE_TLS DEFAULT_FROM_EMAIL; do
-            # The image uses the secrets names in lowercase
-            lowercase_secret=$(echo "$secret" | tr '[:upper:]' '[:lower:]')
-            echo "${!secret}" | docker secret create "$lowercase_secret" -
-          done
-          .github/scripts/check-secrets.sh
-
+  build-image:
+    runs-on: self-hosted
+    needs: [init-project, init-docker]
+    steps:
       - name: Create temporary directory for secrets
         run: |
           export SECRETS_DIR=${WORK_PATH}/secrets
@@ -99,30 +83,72 @@ jobs:
       - name: Write secret to temporary file
         run: |
           echo "Écriture de la clé secrète dans le fichier temporaire..."
-          export SECRET_FILE=${SECRETS_DIR}/secret_key.txt
-          echo "SECRET_FILE=$SECRET_FILE" >> $GITHUB_ENV
-          echo "${{ secrets.SECRET_KEY }}" > "$SECRET_FILE" || (echo "Erreur lors de l'écriture de la clé secrète dans le fichier." && exit 1)
-          chmod 600 "$SECRET_FILE"
-          .github/scripts/check-file-creation.sh "$SECRET_FILE" "secret_key.txt"
+          export SECRET_KEY_FILE=${SECRETS_DIR}/secret_key.txt
+          echo "SECRET_KEY_FILE=$SECRET_KEY_FILE" >> $GITHUB_ENV
+          cd "$SECRETS_DIR" || (echo "Erreur lors de la navigation vers le répertoire des secrets." && exit 1)
+          echo "Création du fichier de clé secrète..."
+          file_creation_error() {
+            local file_name=$1
+            echo "Erreur lors de la création du fichier ${file_name}."
+            exit 1
+          }
+          echo "${{ secrets.SECRET_KEY }}" > "secret_key.txt" || file_creation_error "secret_key.txt"
+          echo "${{ secrets.DB_USER }}" > "db_user.txt" || file_creation_error "db_user.txt"
+          echo "${{ secrets.DB_PASSWORD }}" > "db_password.txt" || file_creation_error "db_password.txt"
+          echo "${{ secrets.DB_NAME }}" > "db_name.txt" || file_creation_error "db_name.txt"
+          echo "${{ secrets.DB_HOST }}" > "db_host.txt" || file_creation_error "db_host.txt"
+          echo "${{ secrets.ALLOWED_HOSTS }}" > "allowed_hosts.txt" || file_creation_error "allowed_hosts.txt"
+          echo "${{ secrets.CORS_ALLOWED_ORIGINS }}" > "cors_allowed_origins.txt" || file_creation_error "cors_allowed_origins.txt"
+          echo "${{ secrets.SENTRY_DSN }}" > "sentry_dsn.txt" || file_creation_error "sentry_dsn.txt"
+          echo "${{ secrets.EMAIL_HOST }}" > "email_host.txt" || file_creation_error "email_host.txt"
+          echo "${{ secrets.EMAIL_PORT }}" > "email_port.txt" || file_creation_error "email_port.txt"
+          echo "${{ secrets.EMAIL_HOST_USER }}" > "email_host_user.txt" || file_creation_error "email_host_user.txt"
+          echo "${{ secrets.EMAIL_HOST_PASSWORD }}" > "email_host_password.txt" || file_creation_error "email_host_password.txt"
+          echo "${{ secrets.EMAIL_USE_TLS }}" > "email_use_tls.txt" || file_creation_error "email_use_tls.txt"
+          echo "${{ secrets.DEFAULT_FROM_EMAIL }}" > "default_from_email.txt" || file_creation_error "default_from_email.txt"
+          for file in "secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_port email_host_user email_host_password email_use_tls default_from_email cors_allowed_origins"; do
+            chmod 600 "${SECRETS_DIR}/${file}.txt"
+            echo "Vérification de la création du fichier ${file}.txt..."
+            .github/scripts/check-file-creation.sh "${SECRETS_DIR}" "${file}.txt"
+          done
+          echo "Fichiers de secrets créés avec succès."
 
       - name: Build Docker image
         run: |
-          .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_FILE}" "${WORK_PATH}"
-          rmdir ${SECRETS_DIR} || echo "Le répertoire ${SECRETS_DIR} n'existe pas ou n'a pas pu être supprimé."
+          DOCKER_BUILDKIT=1
+          if ! timeout 300 docker build \
+          --build-arg ENV=prod \
+          --build-arg DEBUG=false \
+          --secret id=secret_key,src="${SECRET_KEY_FILE}" \
+          -t "${DOCKER_IMAGE}" \
+          -f "${WORK_PATH}/Dockerfile" "${WORK_PATH}";then
+          echo "Erreur : La construction de l'image Docker ${DOCKER_IMAGE} a échoué."
+          exit 1
+          fi
+          .github/scripts/build-image.sh "${DOCKER_IMAGE}" "${SECRET_KEY_FILE}" "${WORK_PATH}"
 
-      - name: Deploy docker stack
+  test:
+    runs-on: self-hosted
+    needs: [build-image]
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Cleanup previous Docker Compose environment
         working-directory: ${{ env.WORK_PATH }}
-        run: docker stack deploy -c stack.yaml ${STACK_NAME}
+        run: docker compose --file compose.test.yaml down --remove-orphans
 
-      - name: Check service status
-        run: |
-          .github/scripts/check-service-status.sh "${SERVICE_NAME}" "${TIMEOUT}"
-
-      - name: Generate failure report
+      - name: Run tests
         working-directory: ${{ env.WORK_PATH }}
-        if: failure()
         run: |
-          echo "Le déploiement a échoué. Logs du service :" > failure-report.txt
-          docker service logs "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun log trouvé." >> failure-report.txt
-          echo "Statut du service :" >> failure-report.txt
-          docker service ps --no-trunc "${SERVICE_NAME}" >> failure-report.txt || echo "Aucun ps trouvé." >> failure-report.txt
+          echo "Lancement des tests..."
+          docker compose --file compose.test.yaml up \
+            --exit-code-from test \
+            --abort-on-container-exit
+
+      - name: Cleanup Docker resources after tests
+        run: |
+          .github/scripts/cleanup-docker.sh
+          echo "Ressources Docker nettoyées après les tests."
