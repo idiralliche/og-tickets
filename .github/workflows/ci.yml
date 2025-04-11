@@ -28,6 +28,7 @@ jobs:
           fetch-depth: 1
           sparse-checkout: |
             backend
+            .github
 
       - name: Cache .git directory
         id: cache-git
