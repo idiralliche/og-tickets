@@ -110,13 +110,30 @@ jobs:
           echo "${{ secrets.EMAIL_HOST_PASSWORD }}" > "email_host_password.txt" || file_creation_error "email_host_password.txt"
           echo "${{ secrets.EMAIL_USE_TLS }}" > "email_use_tls.txt" || file_creation_error "email_use_tls.txt"
           echo "${{ secrets.DEFAULT_FROM_EMAIL }}" > "default_from_email.txt" || file_creation_error "default_from_email.txt"
-          files="secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_port email_host_user email_host_password email_use_tls default_from_email cors_allowed_origins"
-          for file in $files; do
+          files=""
+          for file in ${{ toJSON(env.FILES) }}; do
             chmod 600 "${SECRETS_DIR}/${file}.txt"
             echo "Vérification de la création du fichier ${file}.txt..."
             "${SCRIPTS_PATH}/check-file-creation.sh "${SECRETS_DIR}" "${file}.txt"
           done
           echo "Fichiers de secrets créés avec succès."
+        env:
+          FILES: |
+            secret_key
+            db_user
+            db_password
+            db_name
+            db_host
+            allowed_hosts
+            cors_allowed_origins
+            sentry_dsn
+            email_host
+            email_port
+            email_host_user
+            email_host_password
+            email_use_tls
+            default_from_email
+        shell: bash
 
       - name: Build Docker image
         run: |
