@@ -19,14 +19,14 @@ fi
 
 # Create the directory if it doesn't exist
 if [ ! -d "$DIR" ]; then
-  echo "Création du répertoire '$DIR_NAME' '$DIR'."
+  echo "Création du répertoire '$DIR'."
   mkdir -p "$DIR" || {
-    echo "Erreur : Impossible de créer le répertoire '$DIR_NAME' '$DIR'."
+    echo "Erreur : Impossible de créer le répertoire '$DIR_NAME'."
     exit 1
   }
+  echo "Le répertoire a été créé : $DIR"
 else
-  echo "Le répertoire '$DIR_NAME' '$DIR' existe déjà."
+  echo "Le répertoire '$DIR' existe déjà."
 fi
 chmod 700 "$DIR"
 
-echo "Le répertoire a été créé : $DIR"
