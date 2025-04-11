@@ -127,7 +127,7 @@ jobs:
           "${SCRIPTS_PATH}"/check-image-build.sh "${DOCKER_IMAGE}"
 
       - name: Deploy docker stack
-        run: docker stack deploy -c "${WORK_PATH}"/stack.yaml "${STACK_NAME}"
+        run: docker stack deploy -c "${WORK_PATH}"/stack.yaml "ogtickets-backend-stack"
 
       - name: Check service status
         run: |
