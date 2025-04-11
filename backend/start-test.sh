@@ -18,7 +18,7 @@ wait_for_db() {
   echo "Attente de la disponibilité de la base de données sur $db_host:$db_port..."
 
   # Boucle d'attente : utilisation de timeout pour tenter d'ouvrir une connexion TCP
-  while ! timeout 1 sh -c "</dev/tcp/$db_host/$db_port" ; do
+  while ! nc -z "$db_host" "$db_port"; do
     if [ $elapsed -ge $max_wait_time ]; then
       echo "Erreur : La base de données n'est pas disponible après $max_wait_time secondes."
       exit 1
