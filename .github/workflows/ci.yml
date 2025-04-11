@@ -96,6 +96,7 @@ jobs:
             echo "Erreur lors de la création du fichier ${file_name}."
             exit 1
           }
+          cd "${SECRETS_DIR}" || (echo "Erreur : Impossible de changer de répertoire vers ${SECRETS_DIR}." && exit 1)
           echo "${{ secrets.SECRET_KEY }}" > "secret_key.txt" || file_creation_error "secret_key.txt"
           echo "${{ secrets.DB_USER }}" > "db_user.txt" || file_creation_error "db_user.txt"
           echo "${{ secrets.DB_PASSWORD }}" > "db_password.txt" || file_creation_error "db_password.txt"
@@ -120,13 +121,12 @@ jobs:
 
       - name: Build Docker image
         run: |
-          DOCKER_BUILDKIT=1
-          if ! timeout 300 docker build \
+          if ! timeout 300 DOCKER_BUILDKIT=1 docker build \
           --build-arg ENV=prod \
           --build-arg DEBUG=false \
           --secret id=secret_key,src="${SECRET_KEY_FILE}" \
           -t "${DOCKER_IMAGE}" \
-          -f Dockerfile .;then
+          -f "${WORK_PATH}/Dockerfile" "${WORK_PATH}";then
           echo "Erreur : La construction de l'image Docker ${DOCKER_IMAGE} a échoué."
           exit 1
           fi

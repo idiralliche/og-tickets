@@ -15,7 +15,6 @@ env:
   WORK_PATH: '/home/ubuntu/og-tickets/backend'
   SCRIPTS_PATH: '/home/ubuntu/og-tickets/.github/scripts'
   DOCKER_IMAGE: 'tixidest/ogtickets-backend:latest'
-  STACK_NAME: 'ogtickets-backend-stack'
   SERVICE_NAME: 'ogtickets-backend-stack_backend'
   TIMEOUT: 120
 
@@ -24,7 +23,7 @@ defaults:
     working-directory: /home/ubuntu/og-tickets
 
 jobs:
-  init-project:
+  deploy:
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -60,9 +59,6 @@ jobs:
           fi
           echo "Le dépôt est valide et prêt à être utilisé."
 
-  init-docker:
-    runs-on: self-hosted
-    steps:
       - name: Check if Docker is set up
         run: |
           ${SCRIPTS_PATH}/verify-docker.sh
@@ -76,13 +72,6 @@ jobs:
           ${SCRIPTS_PATH}/cleanup-docker.sh
           echo "Ressources Docker nettoyées."
 
-  build-image:
-    runs-on: self-hosted
-    needs: [init-project, init-docker]
-    defaults:
-      run:
-        working-directory: ${{ env.WORK_PATH }}
-    steps:
       - name: Create directory for secrets
         run: |
           export SECRETS_DIR=${WORK_PATH}/secrets
@@ -100,6 +89,7 @@ jobs:
             echo "Erreur lors de la création du fichier ${file_name}."
             exit 1
           }
+          cd "${SECRETS_DIR}" || (echo "Erreur : Impossible de changer de répertoire vers ${SECRETS_DIR}." && exit 1)
           echo "${{ secrets.SECRET_KEY }}" > "secret_key.txt" || file_creation_error "secret_key.txt"
           echo "${{ secrets.DB_USER }}" > "db_user.txt" || file_creation_error "db_user.txt"
           echo "${{ secrets.DB_PASSWORD }}" > "db_password.txt" || file_creation_error "db_password.txt"
@@ -124,31 +114,23 @@ jobs:
 
       - name: Build Docker image
         run: |
-          DOCKER_BUILDKIT=1
-          if ! timeout 300 docker build \
+          if ! timeout 300 DOCKER_BUILDKIT=1 docker build \
           --build-arg ENV=prod \
           --build-arg DEBUG=false \
           --secret id=secret_key,src="${SECRET_KEY_FILE}" \
           -t "${DOCKER_IMAGE}" \
-          -f Dockerfile .;then
+          -f "${WORK_PATH}/Dockerfile" "${WORK_PATH}";then
           echo "Erreur : La construction de l'image Docker ${DOCKER_IMAGE} a échoué."
           exit 1
           fi
-          ${SCRIPTS_PATH}/check-image-build.sh "${DOCKER_IMAGE}"
+          "${SCRIPTS_PATH}"/check-image-build.sh "${DOCKER_IMAGE}"
 
-  deploy:
-    runs-on: self-hosted
-    needs: [init-project, init-docker, build-image]
-    defaults:
-      run:
-        working-directory: ${{ env.WORK_PATH }}
-    steps:
       - name: Deploy docker stack
-        run: docker stack deploy -c stack.yaml ${STACK_NAME}
+        run: docker stack deploy -c "${WORK_PATH}"/stack.yaml "${STACK_NAME}"
 
       - name: Check service status
         run: |
-          .${SCRIPTS_PATH}/check-service-status.sh "${SERVICE_NAME}" "${TIMEOUT}"
+          ${SCRIPTS_PATH}/check-service-status.sh "${SERVICE_NAME}" "${TIMEOUT}"
 
       - name: Generate failure report
         if: failure()
