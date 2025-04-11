@@ -110,7 +110,6 @@ jobs:
           echo "${{ secrets.EMAIL_HOST_PASSWORD }}" > "email_host_password.txt" || file_creation_error "email_host_password.txt"
           echo "${{ secrets.EMAIL_USE_TLS }}" > "email_use_tls.txt" || file_creation_error "email_use_tls.txt"
           echo "${{ secrets.DEFAULT_FROM_EMAIL }}" > "default_from_email.txt" || file_creation_error "default_from_email.txt"
-          files=""
           for file in ${{ toJSON(env.FILES) }}; do
             chmod 600 "${SECRETS_DIR}/${file}.txt"
             echo "Vérification de la création du fichier ${file}.txt..."
