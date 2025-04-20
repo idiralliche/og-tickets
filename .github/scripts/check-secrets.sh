@@ -6,8 +6,7 @@ set -euo pipefail
 # List of required secrets
 readonly SECRETS=(
   "secret_key" "db_user" "db_password" "db_name" "db_host" "allowed_hosts" "cors_allowed_origins"
-  "sentry_dsn" "email_host" "email_port" "email_host_user" "email_host_password" "email_use_tls"
-  "default_from_email"
+  "sentry_dsn" "email_host" "email_host_password"
 )
 
 # Function to verify all secrets exist

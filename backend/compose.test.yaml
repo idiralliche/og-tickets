@@ -1,4 +1,4 @@
-# This file is only used in development, localy, to run the backend service in a container.
+# This file is only used in test
 services:
   db:
     image: postgres:14
@@ -21,6 +21,10 @@ services:
       DB_PASSWORD: "test_password"
       DB_HOST: db
       DB_PORT: "5432"
+      EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
+      FRONT_BASE_URL: "http://testserver"
+      FRONT_ACTIVATION_ROUTE: "/acces/ouverture"
+      FRONT_PASSWORD_RESET_ROUTE: "/acces/reprise"
     depends_on:
       - db
     networks:

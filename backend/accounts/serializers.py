@@ -11,11 +11,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating a new user.
+    """
+    Serializer for creating a new user.
     The password is write_only so it is not returned in the response.
     """
     password = serializers.CharField(write_only=True)
-    re_password = serializers.CharField(write_only=True)  # pour la confirmation du mot de passe
+    re_password = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
@@ -33,8 +34,16 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        # Remove the re_password field, it is not needed for creation
+        # Remove the re_password field
         validated_data.pop('re_password')
         # Create the user with the default role 'customer'
         user = CustomUser.objects.create_user(**validated_data)
         return user
+
+class ResendActivationSerializer(serializers.Serializer):
+    """Validation schema for activation resend requests"""
+    email = serializers.EmailField(
+        required=True,
+        write_only=True,
+        help_text="Adresse email associée au compte"
+    )
