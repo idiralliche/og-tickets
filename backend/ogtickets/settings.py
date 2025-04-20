@@ -1,74 +1,72 @@
 import os
 import sentry_sdk
-from dotenv import load_dotenv
+from datetime import timedelta
 
-# Setting environment configuration
+
+# *** BASE CONFIGURATION ***
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV = os.getenv('ENV', 'dev')
+DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
-# Initialize Sentry only in production mode
+# *** MONITORING ***
+# Initialize Sentry only in production
 SENTRY_DSN=os.getenv('SENTRY_DSN', '')
 if ENV in ['prod', 'production'] and SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
-        # Add data like request headers and IP for users,
-        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
         send_default_pii=True,
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for tracing.
         traces_sample_rate=1.0,
-        _experiments={
-            # Set continuous_profiling_auto_start to True
-            # to automatically start the profiler on when
-            # possible.
-            "continuous_profiling_auto_start": True,
-        },
+        _experiments={"continuous_profiling_auto_start": True},
     )
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+# *** SECURITY ***
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
-# Set ALLOWED_HOSTS from the environment variable; default to 'localhost,127.0.0.1,[::1]' to allow local IPv4 and IPv6.
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')]
 
-# Application definition
+# *** APPLICATIONS ***
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+    # Django core
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Third-party
     'rest_framework',
     'djoser',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
+
+    # Project apps
+    'accounts',
     'olympic_events',
     'offers',
-    'accounts',
 ]
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
+    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# CORS include "http" or "https" scheme
-scheme = "http"
-if ENV in ["prod","production"] :
-    scheme = "https"
+# *** CORS ***
+CORS_ALLOWED_ORIGINS = [
+    f"{'https' if ENV == 'production' else 'http'}://{host}"
+    for host in os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')
+]
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [f"{scheme}://{host}" for host in os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')]
-
+# *** DJANGO CORE CONFIG ***
 ROOT_URLCONF = "ogtickets.urls"
-
+WSGI_APPLICATION = "ogtickets.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -85,9 +83,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "ogtickets.wsgi.application"
-
-# REST Framework settings
+# *** REST FRAMEWORK ***
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -100,35 +96,51 @@ REST_FRAMEWORK = {
     ],
 }
 
-# DJOSER settings
+# *** AUTHENTICATION & USER MANAGMENT ***
+AUTH_USER_MODEL = 'accounts.CustomUser'
+# Djoser configuration (user registration/password reset)
+FRONT_BASE_URL = os.getenv('FRONT_BASE_URL')
+FRONT_ACTIVATION_ROUTE = os.getenv('FRONT_ACTIVATION_ROUTE')
+USERS_PASSWORD_RESET_ROUTE = os.getenv('USERS_PASSWORD_RESET_ROUTE')
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
-    'SEND_ACTIVATION_EMAIL': True,
-    'ACTIVATION_URL': 'api/auth/users/activation/{uid}/{token}',
-    'PASSWORD_RESET_CONFIRM_URL': 'api/auth/users/reset_password/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': False, # Using custom email flow
+    'ACTIVATION_URL': f"{FRONT_BASE_URL}{FRONT_ACTIVATION_ROUTE}?uid={{uid}}&token={{token}}",
+    'PASSWORD_RESET_CONFIRM_URL': f"{FRONT_BASE_URL}{USERS_PASSWORD_RESET_ROUTE}?uid={{uid}}&token={{token}}",
     'SEND_CONFIRMATION_EMAIL': False,
     'SERIALIZERS': {
         'user_create': 'accounts.serializers.CustomUserCreateSerializer',
         'user': 'accounts.serializers.CustomUserSerializer',
-    }
+    },
 }
-AUTH_USER_MODEL = 'accounts.CustomUser'
+# JWT Configuration with cookie-based refresh tokens
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_COOKIE': 'refreshToken',
+    'AUTH_COOKIE_SECURE': True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_PATH': '/api/auth/jwt/refresh/',
+    'AUTH_COOKIE_SAMESITE': 'None' if DEBUG else 'Lax',
+}
 
-# Email settings
-
-if not os.getenv('EMAIL_HOST'):
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
+# *** EMAIL ***
+if email_host := os.getenv('EMAIL_HOST'):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = os.getenv('EMAIL_HOST')
     EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ['true', '1', 'yes']
-    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ['true', '1', 'yes']
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Database
+# *** DATABASE ***
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -137,44 +149,27 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': int(os.getenv('DB_PORT', 5432)),
-        'OPTIONS': {}  # sslmode only set in production, see below
+        **({'OPTIONS': {'sslmode': 'require'}} if ENV == 'production' else {})
     },
 }
-if ENV in ['prod', 'production']:
-    DATABASES['default']['OPTIONS']['sslmode'] = 'require'
 
-# Password validation
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
+# *** INTERNATIONALIZATION ***
+LANGUAGE_CODE = 'fr' # French UI translations
+TIME_ZONE = 'Europe/Paris'
+USE_I18N = True # Enable internationalization system
+USE_TZ = True # Use timezone-aware datetimes
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-LANGUAGE_CODE = 'fr'
-
-TIME_ZONE = "Europe/Paris"
-
-USE_I18N = True
-
-USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = "/static/"
-# Directory where collectstatic will gather all static files.
+# *** STATIC FILES ***
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# *** PASSWORD VALIDATION ***
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# *** DEFAULT AUTO FIELD ***
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

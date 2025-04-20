@@ -8,21 +8,26 @@ services:
         mode: host
     environment:
       ENV: prod
+      DEBUG: false
+      FRONT_BASE_URL: https://og-tickets.vercel.app
+      EMAIL_USE_TLS: true
+      EMAIL_HOST_USER: noreply@ogtickets.space
+      EMAIL_PORT: 587
+      DEFAULT_FROM_EMAIL: 'Ne pas répondre - comptes utilisateur <noreply@ogtickets.space>'
+      FRONT_BASE_URL: "http://testserver"
+      FRONT_ACTIVATION_ROUTE: "/acces/ouverture"
+      FRONT_PASSWORD_RESET_ROUTE: "/acces/reprise"
     secrets:
       - source: secret_key
-      - source: db_password
-      - source: sentry_dsn
-      - source: db_user
       - source: db_name
       - source: db_host
-      - source: cors_allowed_origins
+      - source: db_user
+      - source: db_password
       - source: allowed_hosts
+      - source: cors_allowed_origins
       - source: email_host
-      - source: email_port
-      - source: email_host_user
       - source: email_host_password
-      - source: email_use_tls
-      - source: default_from_email
+      - source: sentry_dsn
     deploy:
       replicas: 1
       restart_policy:
@@ -43,29 +48,21 @@ services:
 secrets:
   secret_key:
     external: true
-  db_user:
-    external: true
-  db_password:
-    external: true
   db_name:
     external: true
   db_host:
+    external: true
+  db_user:
+    external: true
+  db_password:
     external: true
   allowed_hosts:
     external: true
   cors_allowed_origins:
     external: true
-  sentry_dsn:
-    external: true
   email_host:
-    external: true
-  email_port:
-    external: true
-  email_host_user:
     external: true
   email_host_password:
     external: true
-  email_use_tls:
-    external: true
-  default_from_email:
+  sentry_dsn:
     external: true

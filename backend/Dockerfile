@@ -32,8 +32,7 @@ ENV DEBUG=${DEBUG}
 # collectstatic requires SECRET_KEY to be set
 # use a secret file mounted as a volume for SECRET_KEY
 RUN --mount=type=secret,id=secret_key,dst=/run/secrets/secret_key \
-    SECRET_KEY=$(cat /run/secrets/secret_key) && \
-    python manage.py collectstatic --noinput
+    sh -c "export SECRET_KEY=$(cat /run/secrets/secret_key) && python manage.py collectstatic --noinput"
 
 # Stage 2: Final image
 FROM python:3.12-slim
@@ -56,6 +55,7 @@ COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
 # Switch to non-root user
+RUN chown -R appuser:appuser /app
 USER appuser
 
 # Expose the application port
