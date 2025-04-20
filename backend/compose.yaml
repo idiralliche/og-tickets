@@ -38,9 +38,9 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
       EMAIL_HOST: ${EMAIL_HOST}
       EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
-
     volumes:
-      - ./secrets/secret_key.txt:/run/secrets/secret_key:ro- ./secrets/db_user.txt:/run/secrets/db_user:ro
+      - ./secrets/secret_key.txt:/run/secrets/secret_key:ro
+      - ./secrets/db_user.txt:/run/secrets/db_user:ro
       - ./secrets/db_password.txt:/run/secrets/db_password:ro
       - ./secrets/db_name.txt:/run/secrets/db_name:ro
       - ./secrets/db_host.txt:/run/secrets/db_host:ro

@@ -62,6 +62,7 @@ apply_migrations() {
 
 # Apply migrations
 apply_migrations
+python manage.py collectstatic --noinput || echo "Erreur lors de la collecte des fichiers statiques. Execution manuelle requise"
 
 # Launch Gunicorn to start the Django app
 echo "Démarrage de Gunicorn..."

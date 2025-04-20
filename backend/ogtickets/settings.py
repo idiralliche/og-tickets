@@ -3,13 +3,14 @@ import sentry_sdk
 from datetime import timedelta
 
 
-# *** BASE CONFIGURATION ***
+# BASE_DIR
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# ENVIRONMENT
 ENV = os.getenv('ENV', 'dev')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
-# *** MONITORING ***
-# Initialize Sentry only in production
+# SENTRY (only in production)
 SENTRY_DSN=os.getenv('SENTRY_DSN', '')
 if ENV in ['prod', 'production'] and SENTRY_DSN:
     sentry_sdk.init(
@@ -19,54 +20,51 @@ if ENV in ['prod', 'production'] and SENTRY_DSN:
         _experiments={"continuous_profiling_auto_start": True},
     )
 
-# *** SECURITY ***
+# SECRET & HOSTS
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')]
 
-# *** APPLICATIONS ***
+# APPLICATIONS
 INSTALLED_APPS = [
-    # Django core
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
-    # Third-party
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     'rest_framework',
     'djoser',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-
-    # Project apps
     'accounts',
     'olympic_events',
     'offers',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    "django.middleware.security.SecurityMiddleware",
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# *** CORS ***
-CORS_ALLOWED_ORIGINS = [
-    f"{'https' if ENV == 'production' else 'http'}://{host}"
-    for host in os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')
-]
+# CORS
+# include "http" or "https" scheme
+scheme = "http"
+if ENV in ["prod","production"] :
+    scheme = "https"
+CORS_ALLOWED_ORIGINS = [f"{scheme}://{host}" for host in os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')]
 CORS_ALLOW_CREDENTIALS = True
 
-# *** DJANGO CORE CONFIG ***
+# URLs
 ROOT_URLCONF = "ogtickets.urls"
-WSGI_APPLICATION = "ogtickets.wsgi.application"
+
+# TEMPLATES, WSGI
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -83,7 +81,9 @@ TEMPLATES = [
     },
 ]
 
-# *** REST FRAMEWORK ***
+WSGI_APPLICATION = "ogtickets.wsgi.application"
+
+# REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -96,17 +96,16 @@ REST_FRAMEWORK = {
     ],
 }
 
-# *** AUTHENTICATION & USER MANAGMENT ***
-AUTH_USER_MODEL = 'accounts.CustomUser'
-# Djoser configuration (user registration/password reset)
-FRONT_BASE_URL = os.getenv('FRONT_BASE_URL')
-FRONT_ACTIVATION_ROUTE = os.getenv('FRONT_ACTIVATION_ROUTE')
-USERS_PASSWORD_RESET_ROUTE = os.getenv('USERS_PASSWORD_RESET_ROUTE')
+# Djoser
+FRONT_BASE_URL = os.getenv('FRONT_BASE_URL', 'http://localhost:8080')
+USERS_ACTIVATION = os.getenv('FRONT_ACTIVATION_ROUTE', '/acces/ouverture')
+USERS_PASSWORD_RESET_ROUTE = os.getenv('USERS_PASSWORD_RESET_ROUTE','/acces/reprise')
+
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,
-    'SEND_ACTIVATION_EMAIL': False, # Using custom email flow
-    'ACTIVATION_URL': f"{FRONT_BASE_URL}{FRONT_ACTIVATION_ROUTE}?uid={{uid}}&token={{token}}",
+    'SEND_ACTIVATION_EMAIL': False,
+    'ACTIVATION_URL': f"{FRONT_BASE_URL}{USERS_ACTIVATION}?uid={{uid}}&token={{token}}",
     'PASSWORD_RESET_CONFIRM_URL': f"{FRONT_BASE_URL}{USERS_PASSWORD_RESET_ROUTE}?uid={{uid}}&token={{token}}",
     'SEND_CONFIRMATION_EMAIL': False,
     'SERIALIZERS': {
@@ -114,33 +113,42 @@ DJOSER = {
         'user': 'accounts.serializers.CustomUserSerializer',
     },
 }
-# JWT Configuration with cookie-based refresh tokens
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# SIMPLE_JWT (with cookie settings)
+if DEBUG:
+    samesite = 'None'
+else:
+    samesite = 'Lax'
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'SIGNING_KEY': SECRET_KEY,
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_COOKIE': 'refreshToken',
     'AUTH_COOKIE_SECURE': True,
-    'AUTH_COOKIE_HTTP_ONLY': True,
-    'AUTH_COOKIE_PATH': '/api/auth/jwt/refresh/',
-    'AUTH_COOKIE_SAMESITE': 'None' if DEBUG else 'Lax',
+    'AUTH_COOKIE_HTTP_ONLY': True, # no access to JS
+    'AUTH_COOKIE_PATH': '/api/auth/jwt/refresh/', 
+    'AUTH_COOKIE_SAMESITE': samesite,
 }
 
-# *** EMAIL ***
-if email_host := os.getenv('EMAIL_HOST'):
+# EMAIL (console or SMTP)
+if not os.getenv('EMAIL_HOST'):
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = os.getenv('EMAIL_HOST')
     EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ['true', '1', 'yes']
-    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ['true', '1', 'yes']
+    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
-# *** DATABASE ***
+# DATABASE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -149,21 +157,12 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': int(os.getenv('DB_PORT', 5432)),
-        **({'OPTIONS': {'sslmode': 'require'}} if ENV == 'production' else {})
     },
 }
+if ENV in ['prod', 'production']:
+    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
 
-# *** INTERNATIONALIZATION ***
-LANGUAGE_CODE = 'fr' # French UI translations
-TIME_ZONE = 'Europe/Paris'
-USE_I18N = True # Enable internationalization system
-USE_TZ = True # Use timezone-aware datetimes
-
-# *** STATIC FILES ***
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# *** PASSWORD VALIDATION ***
+# PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -171,5 +170,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# *** DEFAULT AUTO FIELD ***
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# I18N
+LANGUAGE_CODE = 'fr'
+TIME_ZONE = "Europe/Paris"
+USE_I18N = True
+USE_TZ = True
+
+#STATIC
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
