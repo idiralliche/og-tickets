@@ -57,7 +57,7 @@ Le backend de **og-tickets** a été conçu de manière modulaire en utilisant l
 - **accounts** gère l'authentification, la gestion des utilisateurs et la sécurité via Djoser et JWT.
 - **offers** s'occupe de la gestion des offres de billets.
 - **olympic_events** gère l'affichage et l'administration des événements sportifs.
-- Les autres services ne sont pas encore développés mais la'étape suivante est **cart** pour gérer le panier utilisateur...
+- Les autres services ne sont pas encore développés mais l'étape suivante est **cart** pour gérer le panier utilisateur...
 
 Cette organisation offre plusieurs avantages :
 
@@ -99,7 +99,7 @@ Cette stratégie de développement renforce la maintenabilité et la testabilit�
 
 ## Mesures de Sécurité
 
-### Authentification et Autorisation :
+### Authentification et Autorisation :
 
 - Inscription sécurisée avec vérification par email via Djoser
 - Utilisation de JWT pour l'authentification des API
