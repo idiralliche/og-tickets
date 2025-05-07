@@ -1,6 +1,8 @@
 from typing import Optional
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -54,6 +56,7 @@ class CookieHandler:
         """Basic JWT format validation"""
         return len(token.split('.')) == 3
 
+@method_decorator(csrf_protect, name='dispatch')
 class ActivationResendView(APIView):
     """
     Handle silent account activation email resend
@@ -87,6 +90,7 @@ class ActivationResendView(APIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@method_decorator(csrf_protect, name='dispatch')
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     JWT Authentication endpoint with refresh token in HttpOnly cookie
@@ -107,7 +111,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         return response
 
-
+@method_decorator(csrf_protect, name='dispatch')
 class CustomTokenRefreshView(TokenRefreshView):
     """
     JWT Refresh endpoint with cookie-based refresh token handling

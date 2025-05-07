@@ -1,6 +1,7 @@
 import os
 import sentry_sdk
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 
 # BASE_DIR
@@ -60,6 +61,10 @@ if ENV in ["prod","production"] :
     scheme = "https"
 CORS_ALLOWED_ORIGINS = [f"{scheme}://{host}" for host in os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+  'x-csrftoken',
+]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
 
 # URLs
 ROOT_URLCONF = "ogtickets.urls"
@@ -117,11 +122,6 @@ DJOSER = {
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # SIMPLE_JWT (with cookie settings)
-if DEBUG:
-    samesite = 'None'
-else:
-    samesite = 'Lax'
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
@@ -133,7 +133,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_SECURE': True,
     'AUTH_COOKIE_HTTP_ONLY': True, # no access to JS
     'AUTH_COOKIE_PATH': '/api/auth/jwt/refresh/', 
-    'AUTH_COOKIE_SAMESITE': samesite,
+    'AUTH_COOKIE_SAMESITE': 'None',
 }
 
 # EMAIL (console or SMTP)

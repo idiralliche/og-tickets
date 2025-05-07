@@ -5,6 +5,12 @@ from accounts.views import (
     LogoutView,
     ActivationResendView, 
 )
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+
+def get_csrf(request):
+    # renvoie un simple JSON pour forcer la génération du cookie csrftoken
+    return JsonResponse({'detail': 'CSRF token set'})
 
 # API Endpoints
 urlpatterns = [
@@ -28,5 +34,8 @@ urlpatterns = [
 
     # Djoser built-in authentication endpoints
     path('', include('djoser.urls')),
+
+    # CSRF token endpoint
+    path('csrf/', ensure_csrf_cookie(get_csrf), name='csrf-token'),
   ]))
 ]
