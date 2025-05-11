@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
       const { access } = await authService.refreshToken();
       if (access) {
         setAccessToken(access);
+        // TODOs:
         // Eventually update user details if decoded from the token or ask info from the backend
         // const decodedToken = jwt_decode(access);
         // setUser(decodedToken);
@@ -26,7 +27,7 @@ export const AuthProvider = ({ children }) => {
         // const userDetails = await fetchUserDetails(access);
         // setUser(userDetails);
       } else {
-        // si pas de access, on considère que la session n'est plus valide
+        // If no access, session is not valid
         localStorage.removeItem('wasLoggedIn');
       }
     } catch (_) {
