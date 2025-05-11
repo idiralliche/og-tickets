@@ -18,7 +18,7 @@ describe('Header component', () => {
     const eventsLinks = screen.getAllByTestId('nav-link-events');
     const offersLinks = screen.getAllByTestId('nav-link-offers');
     const cartLinks = screen.getAllByTestId('nav-link-cart');
-    const loginLinks = screen.getAllByTestId('nav-link-login');
+    const loginLinks = screen.getAllByTestId('nav-link-account');
 
     expect(eventsLinks).toHaveLength(2);
     expect(offersLinks).toHaveLength(2);
