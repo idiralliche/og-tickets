@@ -64,6 +64,6 @@ apply_migrations() {
 apply_migrations
 python manage.py collectstatic --noinput || echo "Erreur lors de la collecte des fichiers statiques. Execution manuelle requise"
 
-# Launch Gunicorn to start the Django app
-echo "Démarrage de Gunicorn..."
-exec gunicorn --bind 0.0.0.0:8000 --workers 1 ogtickets.wsgi:application
+# Forward to CMD (Gunicorn or Celery worker)
+echo "Executing command: $@"
+exec "$@"

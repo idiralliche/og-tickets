@@ -55,5 +55,7 @@ USER appuser
 # Expose the application port
 EXPOSE 8000
 
-# Start the application using gunicorn
-CMD ["sh", "/start.sh"]
+# Use start.sh as entrypoint
+ENTRYPOINT ["/start.sh"]
+# Default command for web server
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "ogtickets.wsgi:application"]
