@@ -1,16 +1,17 @@
 import os
+import django
 from celery import Celery
+from typing import Final
 
-# Indique à Django de charger les settings
+# 1) Configure Django settings module environment variable
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ogtickets.settings')
 
-app = Celery('ogtickets')
+# 2) Initialize Django application context
+django.setup()
 
-# Charge la config Celery depuis tes settings.py (sous clé CELERY_)
+# 3) Create Celery application instance
+app: Final[Celery] = Celery('ogtickets')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Recherche automatiquement les tâches dans chaque app Django
+# 4) Auto-discover asynchronous tasks in all installed apps
 app.autodiscover_tasks()
-
-# Optionnel : log niveau info
-app.conf.worker_log_format = '[%(asctime)s:%(levelname)s/%(processName)s] %(message)s'

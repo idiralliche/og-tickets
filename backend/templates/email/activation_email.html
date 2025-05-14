@@ -1,0 +1,33 @@
+{% block subject %}
+Activez votre compte OG-Tickets
+{% endblock subject %}
+
+{% block text_body %}
+Bonjour {{ user.first_name }},
+
+Merci de vous être inscrit·e sur OG-Tickets !  
+Pour activer votre compte, cliquez ou copiez-collez ce lien :  
+{{ protocol }}://{{ domain }}/{{ url }}
+
+— L'équipe OG-Tickets
+{% endblock text_body %}
+
+{% block html_body %}
+<p>Bonjour {{ user.first_name }},</p>
+<p>Merci de vous être inscrit·e sur <strong>OG-Tickets</strong> !<br>
+Pour activer votre compte, cliquez sur le bouton ci-dessous :</p>
+
+<p style="text-align:center;">
+  <a href="{{ protocol }}://{{ domain }}/{{ url }}"
+     style="display:inline-block;padding:12px 24px;
+            background:#1d4ed8;color:#fff;
+            text-decoration:none;border-radius:4px;">
+    Activer mon compte
+  </a>
+</p>
+
+<p>Si le bouton ne fonctionne pas, copiez-collez ce lien :<br>
+{{ protocol }}://{{ domain }}/{{ url }}</p>
+
+<p>— L'équipe <strong>OG-Tickets</strong></p>
+{% endblock html_body %}
