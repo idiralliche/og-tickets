@@ -270,6 +270,10 @@ STATIC_URL: str = "/static/"
 STATIC_ROOT: str = os.path.join(BASE_DIR, 'staticfiles')
 """Absolute path to collect static files."""
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 # ====================== #
 #  CELERY & BACKGROUND TASKS
 # ====================== #
