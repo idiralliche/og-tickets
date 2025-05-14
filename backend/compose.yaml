@@ -61,9 +61,11 @@ services:
     image: tixidest/ogtickets-backend:latest
     ports:
       - "8000:8000"
+    restart: unless-stopped
     environment:
       <<: *common-env
     volumes: *common-volumes
+    command: ["django"]
     depends_on:
       - db
       - redis
@@ -75,10 +77,10 @@ services:
     environment:
       <<: *common-env
     volumes: *common-volumes
-    command: celery -A ogtickets worker --loglevel=info
+    command: ["celery"]
     depends_on:
       - redis
-      - backend
+      - db
     networks:
       - ogtickets_nw
 

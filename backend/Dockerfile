@@ -46,7 +46,10 @@ COPY --from=builder /app /app
 
 # Copy entrypoint script
 COPY start.sh /start.sh
+
+# Make scripts executable
 RUN chmod +x /start.sh
+RUN chmod +x /app/scripts/*.sh
 
 # Switch to non-root user
 RUN chown -R appuser:appuser /app
@@ -58,4 +61,4 @@ EXPOSE 8000
 # Use start.sh as entrypoint
 ENTRYPOINT ["/start.sh"]
 # Default command for web server
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "ogtickets.wsgi:application"]
+CMD ["django"]
