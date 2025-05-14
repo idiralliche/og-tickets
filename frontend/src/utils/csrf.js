@@ -10,7 +10,9 @@ export function getCSRFToken() {
   return null;
 }
 
-export const buildCSRFHeaders = (headers) => {
+export const buildCSRFHeaders = (
+  headers = { 'Content-Type': 'application/json' }
+) => {
   const csrfToken = getCSRFToken();
   if (csrfToken) headers['X-CSRFToken'] = csrfToken;
   return headers;
