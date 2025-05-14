@@ -1,5 +1,5 @@
 import { makeAuthPostRequest } from '../utils/authRequest';
-import { buildCSRFHeaders } from './csrf';
+import { buildCSRFHeaders } from '../utils/csrf';
 
 // User Management
 export const authService = {

@@ -4,7 +4,7 @@ import { buildCSRFHeaders } from './csrf';
  * Base URL for authentication-related API endpoints
  * @constant {string}
  */
-const API_AUTH_URL = `${process.env.REACT_APP_BACKEND_BASE_URL}api/auth/users/`;
+const API_AUTH_URL = `${process.env.REACT_APP_BACKEND_BASE_URL}api/auth/`;
 
 /**
  * Handles authentication-related API requests with CSRF protection
@@ -39,7 +39,11 @@ export const makeAuthPostRequest = async (
       );
     }
 
-    return await response.json();
+    if (response.status === 204) {
+      return null;
+    }
+
+    return await response.json().catch(() => null);
   } catch (error) {
     // console.error(`Auth Error (${action}):`, error);
     throw error;
