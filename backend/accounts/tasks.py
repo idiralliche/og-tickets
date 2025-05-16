@@ -27,7 +27,7 @@ def send_activation_email_task(self, user_id):
     Context Variables:
         uid: Encoded user ID for URL safety
         token: Generated activation token
-        domain: From settings.FRONT_DOMAIN
+        domain: From settings.FRONTEND_DOMAIN
         protocol: From settings.EMAIL_FRONTEND_PROTOCOL
         url: Formatted activation URL from DJOSER settings
     """
@@ -39,7 +39,7 @@ def send_activation_email_task(self, user_id):
             "user": user,
             "uid": uid,
             "token": token,
-            "domain": settings.FRONT_DOMAIN,
+            "domain": settings.FRONTEND_DOMAIN,
             "protocol": settings.EMAIL_FRONTEND_PROTOCOL,
             "url": settings.DJOSER["ACTIVATION_URL"].format(uid=uid, token=token),
         }
@@ -51,7 +51,6 @@ def send_activation_email_task(self, user_id):
             from_email=settings.DEFAULT_FROM_EMAIL,
             # fail_silently=False (default)
         )
-
     except Exception as exc:
         raise self.retry(exc=exc)
 
@@ -82,7 +81,7 @@ def send_password_reset_email_task(self, user_id):
             "user": user,
             "uid": uid,
             "token": token,
-            "domain": settings.FRONT_DOMAIN,
+            "domain": settings.FRONTEND_DOMAIN,
             "protocol": settings.EMAIL_FRONTEND_PROTOCOL,
             "url": settings.DJOSER["PASSWORD_RESET_CONFIRM_URL"].format(uid=uid, token=token),
         }

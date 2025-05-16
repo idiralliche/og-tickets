@@ -44,11 +44,11 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
         path('jwt/refresh/', CustomTokenRefreshView.as_view(), name='jwt-refresh'),
         path('jwt/logout/', LogoutView.as_view(), name='jwt-logout'),
         
-        # Custom user management routes
-        path('', include(router.urls)),
-        
         # Djoser built-in authentication endpoints
         path('', include('djoser.urls')),
+        
+        # Custom user management routes
+        path('', include(router.urls)),
         
         # Security endpoints
         path('csrf/', ensure_csrf_cookie(get_csrf), name='csrf-token'),

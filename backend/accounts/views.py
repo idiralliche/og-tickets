@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Any
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
@@ -10,7 +10,7 @@ from rest_framework.request import Request
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from djoser.views import UserViewSet as DjoserUserViewSet
-from .tasks import send_password_reset_email_task
+from .tasks import send_password_reset_email_task, send_password_reset_email_task
 from .models import CustomUser
 
 # Cookie configuration constants from settings
