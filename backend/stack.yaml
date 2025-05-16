@@ -124,6 +124,6 @@ secrets:
   sentry_dsn:
     external: true
 
-  networks:
-    ogtickets_nw:
-      driver: overlay
+networks:
+  ogtickets_nw:
+    driver: overlay
