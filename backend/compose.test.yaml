@@ -7,6 +7,12 @@ services:
       POSTGRES_DB: test_ogtickets_db
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - test_net
+
+  redis:
+    image: redis:7-alpine
     networks:
       - test_net
 
@@ -22,14 +28,21 @@ services:
       DB_HOST: db
       DB_PORT: "5432"
       EMAIL_BACKEND: "django.core.mail.backends.locmem.EmailBackend"
-      FRONT_BASE_URL: "http://testserver"
-      FRONT_ACTIVATION_ROUTE: "/acces/ouverture"
-      FRONT_PASSWORD_RESET_ROUTE: "/acces/reprise"
+      FRONTEND_DOMAIN: "testserver"
+      USERS_ACTIVATION_ROUTE: "acces/ouverture"
+      USERS_PASSWORD_RESET_ROUTE: "acces/reprise"
+      CELERY_TASK_ALWAYS_EAGER: "True"
+      CELERY_TASK_EAGER_PROPAGATES: "True"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
     depends_on:
       - db
+      - redis
     networks:
       - test_net
-    command: sh start-test.sh
+    command: ["test"]
 
 networks:
   test_net:
+    driver: bridge
+    internal: true

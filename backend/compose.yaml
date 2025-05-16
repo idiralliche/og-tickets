@@ -8,7 +8,7 @@ x-common-env: &common-env
     EMAIL_HOST_USER: noreply@ogtickets.space
     EMAIL_PORT: 587
     DEFAULT_FROM_EMAIL: "Ne pas répondre - comptes utilisateur <noreply@ogtickets.space>"
-    FRONT_DOMAIN: localhost:8080
+    FRONTEND_DOMAIN: localhost:8080
     USERS_ACTIVATION_ROUTE: "acces/ouverture"
     USERS_PASSWORD_RESET_ROUTE: "acces/reprise"
     REDIS_URL: redis://redis:6379/0
