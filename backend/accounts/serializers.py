@@ -39,11 +39,3 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
         # Create the user with the default role 'customer'
         user = CustomUser.objects.create_user(**validated_data)
         return user
-
-class ResendActivationSerializer(serializers.Serializer):
-    """Validation schema for activation resend requests"""
-    email = serializers.EmailField(
-        required=True,
-        write_only=True,
-        help_text="Adresse email associée au compte"
-    )

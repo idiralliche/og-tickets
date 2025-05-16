@@ -46,7 +46,10 @@ COPY --from=builder /app /app
 
 # Copy entrypoint script
 COPY start.sh /start.sh
+
+# Make scripts executable
 RUN chmod +x /start.sh
+RUN chmod +x /app/scripts/*.sh
 
 # Switch to non-root user
 RUN chown -R appuser:appuser /app
@@ -55,5 +58,7 @@ USER appuser
 # Expose the application port
 EXPOSE 8000
 
-# Start the application using gunicorn
-CMD ["sh", "/start.sh"]
+# Use start.sh as entrypoint
+ENTRYPOINT ["/start.sh"]
+# Default command for web server
+CMD ["django"]

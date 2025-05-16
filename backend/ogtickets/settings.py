@@ -1,17 +1,69 @@
 import os
 import sentry_sdk
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
+# ====================== #
+#      CORE SETTINGS     #
+# ====================== #
 
-# BASE_DIR
+# Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+"""Base directory of the Django project (absolute path)."""
 
-# ENVIRONMENT
+# Environment
 ENV = os.getenv('ENV', 'dev')
-DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
+"""Current environment (dev, staging, prod). Defaults to 'dev'."""
 
-# SENTRY (only in production)
-SENTRY_DSN=os.getenv('SENTRY_DSN', '')
+DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
+"""Debug mode. Defaults to False."""
+
+SCHEME = "https" if ENV in ["prod", "production"] else "http"
+"""Protocol scheme (http/https) based on environment."""
+
+# ====================== #
+#    SECURITY SETTINGS   #
+# ====================== #
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+"""Django secret key. Must be set in production."""
+
+ALLOWED_HOSTS = [
+    host.strip() for host in 
+    os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')
+]
+"""List of allowed hostnames for security."""
+
+CORS_ALLOWED_ORIGINS = [
+    f"{SCHEME}://{host}" for host in 
+    os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')
+]
+"""List of allowed origins for CORS."""
+
+CORS_ALLOW_CREDENTIALS = True
+"""Allow cookies in cross-origin requests."""
+
+CORS_ALLOW_HEADERS = list(default_headers) + ['x-csrftoken']
+"""Additional allowed headers for CORS requests."""
+
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
+"""Origins that are trusted for CSRF purposes."""
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+"""Password strength validation rules (Django defaults)."""
+
+# ====================== #
+#   MONITORING SETTINGS  #
+# ====================== #
+
+SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+"""Sentry DSN for error tracking. Empty string disables Sentry."""
+
 if ENV in ['prod', 'production'] and SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
@@ -19,27 +71,33 @@ if ENV in ['prod', 'production'] and SENTRY_DSN:
         traces_sample_rate=1.0,
         _experiments={"continuous_profiling_auto_start": True},
     )
+    """Initialize Sentry SDK in production with full trace sampling."""
 
-# SECRET & HOSTS
-SECRET_KEY = os.getenv('SECRET_KEY')
-ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')]
+# ====================== #
+#  APPLICATION CONFIG    #
+# ====================== #
 
-# APPLICATIONS
 INSTALLED_APPS = [
+    # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
+    # Third-party apps
     'rest_framework',
     'djoser',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+    
+    # Project apps
     'accounts',
     'olympic_events',
     'offers',
 ]
+"""List of installed applications."""
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -52,19 +110,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+"""Middleware stack for request/response processing."""
 
-# CORS
-# include "http" or "https" scheme
-scheme = "http"
-if ENV in ["prod","production"] :
-    scheme = "https"
-CORS_ALLOWED_ORIGINS = [f"{scheme}://{host}" for host in os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')]
-CORS_ALLOW_CREDENTIALS = True
-
-# URLs
-ROOT_URLCONF = "ogtickets.urls"
-
-# TEMPLATES, WSGI
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -81,9 +128,104 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "ogtickets.wsgi.application"
+ROOT_URLCONF = "ogtickets.urls"
+"""Root URL configuration for the project."""
 
-# REST Framework
+WSGI_APPLICATION = "ogtickets.wsgi.application"
+"""WSGI application entry point."""
+
+# ====================== #
+#  DATABASE SETTINGS     #
+# ====================== #
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': int(os.getenv('DB_PORT', 5432)),
+    }
+}
+"""PostgreSQL database configuration with environment variables."""
+
+if ENV in ['prod', 'production']:
+    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+    """Enforce SSL connections in production environment."""
+
+
+# ====================== #
+#  EMAIL & NOTIFICATIONS
+# ====================== #
+
+SITE_NAME = "OG Tickets"
+"""Site name used in emails."""
+
+FRONTEND_DOMAIN = os.getenv('FRONTEND_DOMAIN', 'localhost:8080')
+"""Frontend domain for email links."""
+
+EMAIL_FRONTEND_PROTOCOL = SCHEME
+"""Protocol for email links (http/https)."""
+
+if not os.getenv('EMAIL_HOST'):
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    """Use console email backend when no SMTP host is configured."""
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT: int = int(os.getenv("EMAIL_PORT", 587))
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ['true', '1', 'yes']
+    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+    """SMTP email configuration when EMAIL_HOST is set."""
+
+# ====================== #
+#  AUTHENTICATION SETTINGS
+# ====================== #
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+"""Custom user model for authentication."""
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_COOKIE': 'refreshToken',
+    'AUTH_COOKIE_SECURE': True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_PATH': '/api/auth/jwt/refresh/', 
+    'AUTH_COOKIE_SAMESITE': 'None',
+}
+"""Configuration for Simple JWT authentication."""
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'SEND_ACTIVATION_EMAIL': False,
+    'ACTIVATION_URL': f"{os.getenv('USERS_ACTIVATION_ROUTE', 'acces/ouverture')}?uid={{uid}}&token={{token}}",
+    'PASSWORD_RESET_CONFIRM_URL': f"{os.getenv('USERS_PASSWORD_RESET_ROUTE','acces/reprise')}?uid={{uid}}&token={{token}}",
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': False,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': False,
+    'SERIALIZERS': {
+        'user_create': 'accounts.serializers.CustomUserCreateSerializer',
+        'user': 'accounts.serializers.CustomUserSerializer',
+    },
+    'EMAIL_FRONTEND_DOMAIN': FRONTEND_DOMAIN,
+    'EMAIL_FRONTEND_PROTOCOL': SCHEME,
+}
+"""Djoser authentication configuration."""
+
+# ====================== #
+#  REST FRAMEWORK SETTINGS
+# ====================== #
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -95,89 +237,78 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ],
 }
+"""REST framework configuration."""
 
-# Djoser
-FRONT_BASE_URL = os.getenv('FRONT_BASE_URL', 'http://localhost:8080')
-USERS_ACTIVATION = os.getenv('FRONT_ACTIVATION_ROUTE', '/acces/ouverture')
-USERS_PASSWORD_RESET_ROUTE = os.getenv('USERS_PASSWORD_RESET_ROUTE','/acces/reprise')
+# ====================== #
+#  INTERNATIONALIZATION  #
+# ====================== #
 
-DJOSER = {
-    'LOGIN_FIELD': 'email',
-    'USER_CREATE_PASSWORD_RETYPE': True,
-    'SEND_ACTIVATION_EMAIL': False,
-    'ACTIVATION_URL': f"{FRONT_BASE_URL}{USERS_ACTIVATION}?uid={{uid}}&token={{token}}",
-    'PASSWORD_RESET_CONFIRM_URL': f"{FRONT_BASE_URL}{USERS_PASSWORD_RESET_ROUTE}?uid={{uid}}&token={{token}}",
-    'SEND_CONFIRMATION_EMAIL': False,
-    'SERIALIZERS': {
-        'user_create': 'accounts.serializers.CustomUserCreateSerializer',
-        'user': 'accounts.serializers.CustomUserSerializer',
-    },
-}
+LANGUAGE_CODE = 'fr'
+"""Default language code (French)."""
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+TIME_ZONE = "Europe/Paris"
+"""Default time zone (Paris)."""
 
-# SIMPLE_JWT (with cookie settings)
-if DEBUG:
-    samesite = 'None'
-else:
-    samesite = 'Lax'
+USE_I18N = True
+"""Enable internationalization system."""
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'SIGNING_KEY': SECRET_KEY,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_COOKIE': 'refreshToken',
-    'AUTH_COOKIE_SECURE': True,
-    'AUTH_COOKIE_HTTP_ONLY': True, # no access to JS
-    'AUTH_COOKIE_PATH': '/api/auth/jwt/refresh/', 
-    'AUTH_COOKIE_SAMESITE': samesite,
-}
+USE_TZ = True
+"""Use timezone-aware datetimes."""
 
-# EMAIL (console or SMTP)
-if not os.getenv('EMAIL_HOST'):
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = os.getenv('EMAIL_HOST')
-    EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ['true', '1', 'yes']
-    DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+# ====================== #
+#  STATIC & MEDIA FILES  #
+# ====================== #
 
-# DATABASE
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': int(os.getenv('DB_PORT', 5432)),
-    },
-}
-if ENV in ['prod', 'production']:
-    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+STATIC_URL = "/static/"
+"""URL prefix for static files."""
 
-# PASSWORD VALIDATION
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+"""Absolute path to collect static files."""
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
 ]
 
-# I18N
-LANGUAGE_CODE = 'fr'
-TIME_ZONE = "Europe/Paris"
-USE_I18N = True
-USE_TZ = True
+# ====================== #
+#  CELERY & BACKGROUND TASKS
+# ====================== #
 
-#STATIC
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+"""Redis connection URL with fallback to local development."""
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', REDIS_URL)
+"""Celery message broker URL."""
+
+CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER', 'False').lower() in ['true','1','yes']
+"""If True, executes tasks synchronously instead of using Celery worker. 
+Useful for testing environments. Defaults to False."""
+
+CELERY_TASK_EAGER_PROPAGATES = (
+    str(os.getenv('CELERY_TASK_EAGER_PROPAGATES', str(CELERY_TASK_ALWAYS_EAGER)))
+    .lower() in ['true', '1', 'yes']
+)
+"""If True, exceptions in eager tasks propagate immediately.
+Defaults to same value as CELERY_TASK_ALWAYS_EAGER when not set.
+Should typically match CELERY_TASK_ALWAYS_EAGER setting."""
+
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', REDIS_URL)
+"""Celery result backend URL."""
+
+CELERY_ACCEPT_CONTENT = ['json']
+"""Allowed content types for task serialization."""
+
+CELERY_TASK_SERIALIZER = 'json'
+"""Default task serializer."""
+
+CELERY_RESULT_SERIALIZER = 'json'
+"""Default result serializer."""
+
+CELERY_TIMEZONE = TIME_ZONE
+"""Celery worker timezone."""
+
+# ====================== #
+#  MISCELLANEOUS SETTINGS
+# ====================== #
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+"""Default primary key field type."""

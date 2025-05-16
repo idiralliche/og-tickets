@@ -1,32 +1,56 @@
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from accounts.views import (
+    CustomUserViewSet,
     CustomTokenObtainPairView,
     CustomTokenRefreshView,
     LogoutView,
-    ActivationResendView, 
 )
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+from typing import List, Union
+from django.urls.resolvers import URLPattern, URLResolver
 
-# API Endpoints
-urlpatterns = [
-  # Business domains
-  path('olympic_events/', include('olympic_events.urls')),
-  path('offers/', include('offers.urls')),
+def get_csrf(request) -> JsonResponse:
+    """CSRF token endpoint handler.
+    
+    Generates and sets CSRF token cookie while returning minimal JSON response.
+    
+    Args:
+        request: HttpRequest object
+        
+    Returns:
+        JsonResponse: Always returns {'detail': 'CSRF token set'} with:
+            - CSRF cookie set via ensure_csrf_cookie decorator
+            - 200 status code
+            
+    Security:
+        Decorated with ensure_csrf_cookie to guarantee token generation
+    """
+    return JsonResponse({'detail': 'CSRF token set'})
 
-  # Authentication endpoints
-  path('auth/', include([
-     # Custom JWT implementation
-    path('jwt/create/', CustomTokenObtainPairView.as_view(), name='jwt-create'),
-    path('jwt/refresh/', CustomTokenRefreshView.as_view(), name='jwt-refresh'),
-    path('jwt/logout/', LogoutView.as_view(), name='jwt-logout'),
+router = DefaultRouter()
+router.register(r'users', CustomUserViewSet, basename='users')
 
-    # Account activation
-    path(
-      'users/resend_activation/',
-      ActivationResendView.as_view(),
-      name='resend-activation'
-    ),
-
-    # Djoser built-in authentication endpoints
-    path('', include('djoser.urls')),
-  ]))
+urlpatterns: List[Union[URLPattern, URLResolver]] = [
+    # Business domains
+    path('olympic_events/', include('olympic_events.urls')),
+    path('offers/', include('offers.urls')),
+    
+    # Authentication API endpoints
+    path('auth/', include([
+        # JWT Authentication endpoints
+        path('jwt/create/', CustomTokenObtainPairView.as_view(), name='jwt-create'),
+        path('jwt/refresh/', CustomTokenRefreshView.as_view(), name='jwt-refresh'),
+        path('jwt/logout/', LogoutView.as_view(), name='jwt-logout'),
+        
+        # Djoser built-in authentication endpoints
+        path('', include('djoser.urls')),
+        
+        # Custom user management routes
+        path('', include(router.urls)),
+        
+        # Security endpoints
+        path('csrf/', ensure_csrf_cookie(get_csrf), name='csrf-token'),
+    ]))
 ]

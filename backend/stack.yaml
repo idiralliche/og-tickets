@@ -1,4 +1,13 @@
 services:
+  redis:
+    image: redis:7-alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - ogtickets_nw
+
   backend:
     image: tixidest/ogtickets-backend:latest
     ports:
@@ -8,15 +17,19 @@ services:
         mode: host
     environment:
       ENV: prod
-      DEBUG: "false"
-      FRONT_BASE_URL: https://og-tickets.vercel.app
-      EMAIL_USE_TLS: "true"
+      DEBUG: 'false'
+      EMAIL_USE_TLS: 'true'
       EMAIL_HOST_USER: noreply@ogtickets.space
       EMAIL_PORT: 587
       DEFAULT_FROM_EMAIL: 'Ne pas répondre - comptes utilisateur <noreply@ogtickets.space>'
-      FRONT_BASE_URL: "http://testserver"
-      FRONT_ACTIVATION_ROUTE: "/acces/ouverture"
-      FRONT_PASSWORD_RESET_ROUTE: "/acces/reprise"
+      FRONTEND_DOMAIN: og-tickets.vercel.app
+      USERS_ACTIVATION_ROUTE: 'acces/ouverture'
+      USERS_PASSWORD_RESET_ROUTE: 'acces/reprise'
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_TASK_ALWAYS_EAGER: 'False'
+      CELERY_TASK_EAGER_PROPAGATES: 'False'
     secrets:
       - source: secret_key
       - source: db_name
@@ -44,6 +57,50 @@ services:
           memory: 256M
       labels:
         - 'space.ogtickets.description=Backend service for ogtickets.space'
+    networks:
+      - ogtickets_nw
+
+  celery_worker:
+    image: tixidest/ogtickets-backend:latest
+    command: ['celery']
+    environment:
+      ENV: prod
+      DEBUG: 'false'
+      FRONTEND_DOMAIN: og-tickets.vercel.app
+      USERS_ACTIVATION_ROUTE: 'acces/ouverture'
+      USERS_PASSWORD_RESET_ROUTE: 'acces/reprise'
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_TASK_ALWAYS_EAGER: 'False'
+      CELERY_TASK_EAGER_PROPAGATES: 'False'
+    secrets:
+      - source: secret_key
+      - source: db_name
+      - source: db_host
+      - source: db_user
+      - source: db_password
+      - source: allowed_hosts
+      - source: cors_allowed_origins
+      - source: email_host
+      - source: email_host_password
+      - source: sentry_dsn
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 256M
+        reservations:
+          cpus: '0.05'
+          memory: 128M
+    networks:
+      - ogtickets_nw
 
 secrets:
   secret_key:
@@ -66,3 +123,7 @@ secrets:
     external: true
   sentry_dsn:
     external: true
+
+  networks:
+    ogtickets_nw:
+      driver: overlay
