@@ -7,7 +7,7 @@ max_wait_time=60
 elapsed=0
 
 if [ -z "$db_host" ] || [ -z "$db_port" ]; then
-  echo "Erreur : DB_HOST ou DB n'est pas défini."
+  echo "Erreur : DB_HOST ou DB_PORT n'est pas défini."
   exit 1
 fi
 

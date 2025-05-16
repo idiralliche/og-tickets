@@ -1,3 +1,33 @@
+# Anchor definition for common environment variables
+x-common-env: &common-env
+  ENV: prod
+  DEBUG: 'false'
+  EMAIL_USE_TLS: 'true'
+  EMAIL_HOST_USER: noreply@ogtickets.space
+  EMAIL_PORT: 587
+  DEFAULT_FROM_EMAIL: 'Ne pas répondre - comptes utilisateur <noreply@ogtickets.space>'
+  FRONTEND_DOMAIN: og-tickets.vercel.app
+  USERS_ACTIVATION_ROUTE: 'acces/ouverture'
+  USERS_PASSWORD_RESET_ROUTE: 'acces/reprise'
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: redis://redis:6379/0
+  CELERY_RESULT_BACKEND: redis://redis:6379/0
+  CELERY_TASK_ALWAYS_EAGER: 'False'
+  CELERY_TASK_EAGER_PROPAGATES: 'False'
+
+# Define common secrets
+x-common-secrets: &common-secrets
+  - secret_key
+  - db_user
+  - db_password
+  - db_name
+  - db_host
+  - allowed_hosts
+  - cors_allowed_origins
+  - sentry_dsn
+  - email_host
+  - email_host_password
+
 services:
   redis:
     image: redis:7-alpine
@@ -10,37 +40,15 @@ services:
 
   backend:
     image: tixidest/ogtickets-backend:latest
+    command: ['django']
     ports:
       - target: 8000
         published: 8000
         protocol: tcp
         mode: host
     environment:
-      ENV: prod
-      DEBUG: 'false'
-      EMAIL_USE_TLS: 'true'
-      EMAIL_HOST_USER: noreply@ogtickets.space
-      EMAIL_PORT: 587
-      DEFAULT_FROM_EMAIL: 'Ne pas répondre - comptes utilisateur <noreply@ogtickets.space>'
-      FRONTEND_DOMAIN: og-tickets.vercel.app
-      USERS_ACTIVATION_ROUTE: 'acces/ouverture'
-      USERS_PASSWORD_RESET_ROUTE: 'acces/reprise'
-      REDIS_URL: redis://redis:6379/0
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
-      CELERY_TASK_ALWAYS_EAGER: 'False'
-      CELERY_TASK_EAGER_PROPAGATES: 'False'
-    secrets:
-      - source: secret_key
-      - source: db_name
-      - source: db_host
-      - source: db_user
-      - source: db_password
-      - source: allowed_hosts
-      - source: cors_allowed_origins
-      - source: email_host
-      - source: email_host_password
-      - source: sentry_dsn
+      <<: *common-env
+    secrets: *common-secrets
     deploy:
       replicas: 1
       restart_policy:
@@ -64,27 +72,8 @@ services:
     image: tixidest/ogtickets-backend:latest
     command: ['celery']
     environment:
-      ENV: prod
-      DEBUG: 'false'
-      FRONTEND_DOMAIN: og-tickets.vercel.app
-      USERS_ACTIVATION_ROUTE: 'acces/ouverture'
-      USERS_PASSWORD_RESET_ROUTE: 'acces/reprise'
-      REDIS_URL: redis://redis:6379/0
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
-      CELERY_TASK_ALWAYS_EAGER: 'False'
-      CELERY_TASK_EAGER_PROPAGATES: 'False'
-    secrets:
-      - source: secret_key
-      - source: db_name
-      - source: db_host
-      - source: db_user
-      - source: db_password
-      - source: allowed_hosts
-      - source: cors_allowed_origins
-      - source: email_host
-      - source: email_host_password
-      - source: sentry_dsn
+      <<: *common-env
+    secrets: *common-secrets
     deploy:
       replicas: 1
       restart_policy:
