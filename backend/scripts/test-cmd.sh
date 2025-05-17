@@ -2,4 +2,4 @@
 set -e
 
 echo "Lancement des tests..."
-exec python manage.py test
+exec python manage.py test --verbosity=2

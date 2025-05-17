@@ -25,7 +25,7 @@ SCHEME = "https" if ENV in ["prod", "production"] else "http"
 #    SECURITY SETTINGS   #
 # ====================== #
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', 'dummy-secret-key&12345678')
 """Django secret key. Must be set in production."""
 
 ALLOWED_HOSTS = [
@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'accounts',
     'olympic_events',
     'offers',
+    'cart',
 ]
 """List of installed applications."""
 
@@ -141,10 +142,10 @@ WSGI_APPLICATION = "ogtickets.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'db'),
+        'NAME': os.getenv('DB_NAME', 'ogtickets_db'),
+        'USER': os.getenv('DB_USER', 'tixidest'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'olympics'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': int(os.getenv('DB_PORT', 5432)),
     }
 }
