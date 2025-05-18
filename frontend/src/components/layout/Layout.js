@@ -6,13 +6,17 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import { TiWarning } from 'react-icons/ti';
 
 const Layout = ({ title, subtitle, children, mainClassName = '' }) => {
   return (
     <div className='layout'>
       <div className='header-warning-message'>
         <p>
-          <p>⚠️ Ce site est un projet à but pédagogique – tout est simulé.</p>
+          <p>
+            <TiWarning /> Ce site est un projet à but pédagogique – tout est
+            simulé.
+          </p>
         </p>
       </div>
       <Header />
