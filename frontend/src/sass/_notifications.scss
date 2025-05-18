@@ -32,17 +32,23 @@ $notifications: (
   }
 }
 
-.error-container {
+.error-container,
+.success-container {
   text-align: center;
   background-color: variables.$purple;
-  color: variables.$red;
   padding: 15px;
   border-radius: 5px;
   margin: 10px auto;
   width: 80%;
 }
-
-.error-message {
+.error-container {
+  color: variables.$red;
+}
+.success-container {
+  color: variables.$text-light;
+}
+.error-message,
+.success-message {
   font-weight: bold;
 }
 

@@ -5,6 +5,28 @@ import Register from '../components/Register';
 import Layout from '../components/layout/Layout';
 import LoadingSpinner from '../components/LoadingSpinner.js';
 
+/**
+ * Account management page that handles:
+ * - Authentication state (logged in/out)
+ * - Login/registration forms
+ * - Account information display
+ *
+ * @component
+ * @returns {JSX.Element} Renders either:
+ *   - Loading spinner during auth check
+ *   - Account management UI when authenticated
+ *   - Login/registration tabs when unauthenticated
+ *
+ * @example
+ * <Route path="/account" element={<AccountPage />} />
+ *
+ * @description
+ * This component provides three distinct views:
+ * 1. Loading state during initial auth check
+ * 2. Minimal account page when user is logged in (with logout option)
+ * 3. Tabbed interface for login/registration when unauthenticated
+ *
+ */
 const AccountPage = () => {
   const { accessToken, loading, logout } = useContext(AuthContext);
   // Tab state to switch between login and register

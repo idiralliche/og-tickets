@@ -64,7 +64,7 @@ const CartPage = () => {
             disabled
             title='Créez un compte / connectez-vous, pour passer commande'
           >
-            Passer la commande
+            Passer commande
           </button>
           <p className='info-message'>
             Vous devez être connecté pour passer commande.

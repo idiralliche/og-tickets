@@ -1,5 +1,41 @@
 import * as Yup from 'yup';
 
+const strictEmailRegex =
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i;
+
+/**
+ * Yup validation schema for user registration.
+ * Validates all fields required for creating a new user account.
+ *
+ * @type {Yup.ObjectSchema}
+ * @property {Yup.StringSchema} first_name - First name validation:
+ *   - Required field
+ *   - Allows letters, accents, spaces, hyphens and apostrophes
+ * @property {Yup.StringSchema} last_name - Last name validation:
+ *   - Required field
+ *   - Same character rules as first_name
+ * @property {Yup.StringSchema} email - Email validation:
+ *   - Required field
+ *   - Basic email format check
+ *   - Strict RFC-compliant email validation
+ * @property {Yup.StringSchema} password - Password validation:
+ *   - Minimum 8 characters
+ *   - Requires lowercase letter
+ *   - Requires uppercase letter
+ *   - Requires number
+ * @property {Yup.StringSchema} re_password - Password confirmation:
+ *   - Must match password field
+ *   - Required field
+ *
+ * @example
+ * await registerSchema.validate({
+ *   first_name: 'Jean',
+ *   last_name: 'Dupont',
+ *   email: 'jean.dupont@example.com',
+ *   password: 'Secure123',
+ *   re_password: 'Secure123'
+ * });
+ */
 const registerSchema = Yup.object().shape({
   first_name: Yup.string()
     .required('Le prénom est requis')
@@ -15,10 +51,15 @@ const registerSchema = Yup.object().shape({
     ),
   email: Yup.string()
     .required("L'email est requis")
-    .email('Adresse email invalide')
-    .matches(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i,
-      "L'email doit être au format valide, par exemple user@example.com"
+    .test(
+      'basic-email-format',
+      'Adresse email invalide',
+      (value) => typeof value === 'string' && /^\S+@\S+\.\S+$/.test(value)
+    )
+    .test(
+      'strict-email-format',
+      "L'email doit être au format valide, par exemple user@example.com",
+      (value) => typeof value === 'string' && strictEmailRegex.test(value)
     ),
   password: Yup.string()
     .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
