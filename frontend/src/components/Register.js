@@ -1,28 +1,46 @@
 import React from 'react';
-import useAuthForm from '../hooks/useAuthForm';
+import useFormAction from '../hooks/useFormAction';
+import useRegisterSubmit from '../hooks/useRegisterSubmit';
 import { registerValidators } from '../validation/authValidators';
 import { authService } from '../services/authService';
-import AuthFields from './AuthFields';
+import Form from './Form';
 
-const Register = ({ onSwitchToLogin, formKey }) => {
-  const initialValues = {
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    re_password: '',
-  };
-
-  const authFormState = useAuthForm(
-    initialValues,
-    registerValidators,
-    authService.register,
-    {
-      successMessage: 'Inscription réussie ! Vérifiez votre email.',
-      failureMessage: 'Échec de l’inscription.',
-      doLogin: false,
-    }
-  );
+/**
+ * Registration form component for new user account creation.
+ *
+ * @component
+ * @returns {JSX.Element} A form with fields for user registration including:
+ *   - First name
+ *   - Last name
+ *   - Email
+ *   - Password
+ *   - Password confirmation
+ *
+ * @example
+ * <Route path="/register" element={<Register />} />
+ *
+ * @description
+ * Handles the complete user registration flow:
+ * - Validates all fields using registerValidators
+ * - Submits data via authService.register
+ * - Processes successful registration with useRegisterSubmit
+ * - Includes password confirmation field
+ */
+const Register = () => {
+  const onRegisterSubmit = useRegisterSubmit();
+  const authFormState = useFormAction({
+    initialValues: {
+      first_name: '',
+      last_name: '',
+      email: '',
+      password: '',
+      re_password: '',
+    },
+    validators: registerValidators,
+    serviceFunction: authService.register,
+    onSubmit: onRegisterSubmit,
+    actionName: 'inscription',
+  });
 
   const fields = [
     {
@@ -53,10 +71,10 @@ const Register = ({ onSwitchToLogin, formKey }) => {
   ];
 
   return (
-    <AuthFields
+    <Form
       fields={fields}
       submitButtonLabel={'S’inscrire'}
-      authFormState={authFormState}
+      formState={authFormState}
     />
   );
 };

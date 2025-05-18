@@ -6,6 +6,8 @@ import OffersPage from './pages/OffersPage.js';
 import CartPage from './pages/CartPage';
 import AccountPage from './pages/AccountPage.js';
 import ActivationPage from './pages/ActivationPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.js';
+import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage.js';
 import UnauthenticatedOnly from './wrappers/UnauthenticatedOnly';
 import MemberOnly from './wrappers/MemberOnly';
 import './main.css';
@@ -23,6 +25,22 @@ const App = () => {
           element={
             <UnauthenticatedOnly redirectTo='/'>
               <ActivationPage />
+            </UnauthenticatedOnly>
+          }
+        />
+        <Route
+          path='/acces/break'
+          element={
+            <UnauthenticatedOnly redirectTo='/'>
+              <ForgotPasswordPage />
+            </UnauthenticatedOnly>
+          }
+        />
+        <Route
+          path='/acces/reprise'
+          element={
+            <UnauthenticatedOnly redirectTo='/'>
+              <ResetPasswordConfirmPage />
             </UnauthenticatedOnly>
           }
         />

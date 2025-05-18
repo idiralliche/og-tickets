@@ -1,63 +1,52 @@
-import { useState, useEffect, useContext } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { NotificationContext } from '../context/NotificationContext';
-import {
-  activateAccount,
-  resendActivation,
-} from '../services/activationService';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { activateAccount } from '../services/activationService';
 
-export const useActivation = () => {
+/**
+ * Custom hook for handling account activation flow.
+ *
+ * @function
+ * @returns {string} Current activation status: 'pending' | 'success' | 'error'
+ *
+ * @example
+ * const activationStatus = useActivation();
+ *
+ * @description
+ * Handles the complete account activation process:
+ * 1. Extracts uid and token from URL search parameters
+ * 2. Validates the presence of required parameters
+ * 3. Makes API call to activate account
+ * 4. Updates status accordingly
+ *
+ * Status transitions:
+ * - Starts as 'pending'
+ * - On success: 'success'
+ * - On missing params or API failure: 'error'
+ *
+ * Note: Designed to work with activation links containing uid and token parameters.
+ */
+export function useActivation() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { showNotification } = useContext(NotificationContext);
-  const [status, setStatus] = useState('pending');
-  const [resendLoading, setResendLoading] = useState(false);
-
-  const uid = searchParams.get('uid');
-  const token = searchParams.get('token');
-  const email = searchParams.get('email');
+  const [status, setStatus] = useState('pending'); // 'pending' | 'success' | 'error'
 
   useEffect(() => {
-    const activate = async () => {
-      if (!uid || !token) {
-        showNotification("Lien d'activation invalide.", 'error');
-        setStatus('error');
-        return;
-      }
+    const uid = searchParams.get('uid');
+    const token = searchParams.get('token');
+
+    if (!uid || !token) {
+      setStatus('error');
+      return;
+    }
+
+    (async () => {
       try {
         await activateAccount(uid, token);
         setStatus('success');
-        showNotification(
-          'Compte activé ! Vous pouvez vous connecter.',
-          'success'
-        );
-        setTimeout(() => navigate('/acces', { replace: true }), 2000);
-      } catch (err) {
-        const errorMessage = 'Erreur lors de la tentative d’activation';
-        console.error(`${errorMessage} :`, err);
-        showNotification(errorMessage, 'error');
+      } catch {
         setStatus('error');
       }
-    };
+    })();
+  }, [searchParams]);
 
-    activate();
-  }, [uid, token, navigate, showNotification]);
-
-  const handleResend = async () => {
-    if (!email) return;
-    setResendLoading(true);
-    try {
-      await resendActivation(email);
-      showNotification('Lien d’activation renvoyé !', 'success');
-    } catch (err) {
-      const errorMessage =
-        'Erreur lors de la tentative de renvoi du lien d’activation';
-      console.error(`${errorMessage} :`, err);
-      showNotification(errorMessage, 'error');
-    } finally {
-      setResendLoading(false);
-    }
-  };
-
-  return { status, email, resendLoading, handleResend };
-};
+  return status;
+}
