@@ -26,7 +26,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 1
+          fetch-depth: 0
           sparse-checkout: |
             backend
             .github
@@ -39,14 +39,6 @@ jobs:
           key: git-cache-${{ github.sha }}
           restore-keys: |
             git-cache-
-
-      - name: Pull latest version of the repository
-        run: |
-          echo "Mise à jour du dépôt depuis origin/main..."
-          git fetch origin main --depth=1 || (echo "Erreur lors de la récupération des mises à jour depuis origin/main." && exit 1)
-          git reset --hard origin/main || (echo "Erreur lors de la mise à jour du dépôt avec git reset --hard." && exit 1)
-          git read-tree -mu HEAD
-          echo "Dépôt mis à jour avec succès."
 
       - name: Verify repository state
         run: |

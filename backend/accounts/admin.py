@@ -10,7 +10,7 @@ class CustomUserAdmin(UserAdmin):
     Extends default UserAdmin with:
     - Email-based authentication
     - Custom field ordering and display
-    - French localization for admin labels
+    - Localization for admin labels
     """
     model = CustomUser
     ordering = ('email',)
