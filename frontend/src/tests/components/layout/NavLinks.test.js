@@ -1,9 +1,19 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import NavLinks from '../../components/NavLinks';
+import NavLinks from '../../../components/layout/NavLinks';
 
+/**
+ * Test suite for the NavLinks component.
+ * @module NavLinksTests
+ * @description Verifies the rendering and functionality of the NavLinks component.
+ */
 describe('NavLinks component', () => {
+  /**
+   * @test {NavLinks} basic rendering
+   * @description Verifies that the NavLinks component renders navigation links with correct accessible names and hrefs.
+   * It checks for the presence of all navigation links and ensures they point to the correct routes.
+   */
   test('renders navigation links with correct accessible names and hrefs', () => {
     render(
       <BrowserRouter>
@@ -27,9 +37,9 @@ describe('NavLinks component', () => {
     expect(loginLink).toBeInTheDocument();
 
     // Check that the links point to the correct routes
-    expect(eventsLink).toHaveAttribute('href', '/olympicEvents');
+    expect(eventsLink).toHaveAttribute('href', '/epreuves');
     expect(offersLink).toHaveAttribute('href', '/offres');
     expect(cartLink).toHaveAttribute('href', '/panier');
-    expect(loginLink).toHaveAttribute('href', '/se-connecter');
+    expect(loginLink).toHaveAttribute('href', '/acces');
   });
 });
