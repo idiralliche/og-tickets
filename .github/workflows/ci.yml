@@ -31,22 +31,9 @@ jobs:
             backend
             .github
 
-      - name: Cache .git directory
-        id: cache-git
-        uses: actions/cache@v3
-        with:
-          path: /home/ubuntu/og-tickets/.git
-          key: git-cache-${{ github.sha }}
-          restore-keys: |
-            git-cache-
-
       - name: Verify repository state
         run: |
-          if ! git rev-parse --is-inside-work-tree &> /dev/null; then
-            echo "Erreur : Le dépôt n'est pas valide."
-            exit 1
-          fi
-          echo "Le dépôt est valide et prêt à être utilisé."
+          "$SCRIPTS_PATH/verify-git-state.sh"
 
   init-docker:
     runs-on: self-hosted
