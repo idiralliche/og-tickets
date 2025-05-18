@@ -45,7 +45,7 @@
       font-size: 1rem;
       padding: 15px;
 
-      .auth-form {
+      .form {
         @include mixins.flex-column;
         width: 100%;
         gap: 20px;
