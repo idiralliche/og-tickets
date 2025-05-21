@@ -12,9 +12,18 @@ class Cart(models.Model):
   modified_at = models.DateTimeField(auto_now=True)
   ordered_at = models.DateTimeField(null=True, blank=True)
 
+  class Meta:
+    constraints = [
+        models.UniqueConstraint(
+            fields=['custom_user'],
+            condition=models.Q(ordered_at__isnull=True),
+            name='unique_open_cart_per_user'
+        )
+    ]
+
   def __str__(self):
     status = '✓' if self.ordered_at else '•'
-    return f"{status} Panier #{self.pk} pour {self.user}"
+    return f"{status} Panier #{self.pk} pour {self.custom_user}"
 
 
 class CartItem(models.Model):
