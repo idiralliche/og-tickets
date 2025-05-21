@@ -13,10 +13,8 @@ const Layout = ({ title, subtitle, children, mainClassName = '' }) => {
     <div className='layout'>
       <div className='header-warning-message'>
         <p>
-          <p>
-            <TiWarning /> Ce site est un projet à but pédagogique – tout est
-            simulé.
-          </p>
+          <TiWarning /> Ce site est un projet à but pédagogique – tout est
+          simulé.
         </p>
       </div>
       <Header />

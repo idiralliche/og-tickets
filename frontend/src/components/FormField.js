@@ -35,9 +35,6 @@ const FormField = ({
         onBlur={onBlur}
         className={hasError ? 'input-error' : ''}
         autoComplete={autoComplete}
-        spellcheck='false'
-        autocorrect='off'
-        autocapitalize='none'
         required
       />
       {hasError && <div className='error-message'>{error}</div>}

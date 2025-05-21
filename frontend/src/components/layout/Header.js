@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import NavLinks from './NavLinks';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,12 +17,12 @@ const Header = () => {
   return (
     <header className='header'>
       <div className='logo'>
-        <a href='/'>
+        <Link to='/'>
           <img
             src={`${process.env.PUBLIC_URL}/og-tickets-w.svg`}
             alt='og-tickets logo'
           />
-        </a>
+        </Link>
       </div>
 
       <nav>
