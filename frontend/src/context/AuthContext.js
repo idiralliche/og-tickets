@@ -120,7 +120,16 @@ export const AuthProvider = ({ children }) => {
 
   // Expose the access token and authentication functions via context
   return (
-    <AuthContext.Provider value={{ accessToken, user, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        user,
+        login,
+        logout,
+        loading,
+        isAuthenticated: !!accessToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

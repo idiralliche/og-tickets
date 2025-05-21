@@ -3,81 +3,79 @@ import { FaTrash } from 'react-icons/fa';
 import { useFlashOnButtonClick } from '../hooks/useFlashOnButtonClick';
 
 /**
- * Component representing an offer item in the shopping cart.
- * Handles quantity adjustment and removal with visual feedback.
- *
+ * Component representing an offer in the cart with options to modify its quantity or remove it.
  * @component
- * @param {Object} props - Component props
- * @param {Object} props.item - The cart item object
- * @param {Object} props.item.offer - The offer details
- * @param {string} props.item.offer.id - Unique identifier for the offer
- * @param {string} props.item.offer.name - Name of the offer
- * @param {number} props.item.offer.price - Price of the offer
- * @param {number} props.item.quantity - Current quantity in cart
- * @param {Function} props.onIncrement - Callback for increasing quantity
- * @param {Function} props.onDecrement - Callback for decreasing quantity
- * @param {Function} props.onQuantityChange - Callback for direct quantity input
- * @param {Function} props.onRemove - Callback for removing item from cart
- * @returns {JSX.Element} Cart item with quantity controls and removal option
- *
- * @example
- * <InCartOffer
- *   item={cartItem}
- *   onIncrement={handleIncrement}
- *   onDecrement={handleDecrement}
- *   onRemove={handleRemove}
- *   onQuantityChange={handleQuantityChange}
- * />
- *
- * @description
- * Features include:
- * - Visual feedback (flash) on button interactions
- * - Quantity adjustment via buttons or direct input
- * - Confirmation dialog before removal
- * - Real-time price calculation
+ * @param {Object} props - The component props.
+ * @param {Object} props.offer - The offer data.
+ * @param {string} props.offer.name - The name of the offer.
+ * @param {string} [props.offer.description] - The description of the offer.
+ * @param {number} props.offer.price - The price of the offer.
+ * @param {number} props.quantity - The quantity of the offer in the cart.
+ * @param {Function} props.onIncrement - Function to increment the quantity of the offer.
+ * @param {Function} props.onDecrement - Function to decrement the quantity of the offer.
+ * @param {Function} props.onQuantityChange - Function to change the quantity of the offer.
+ * @param {Function} props.onRemove - Function to remove the offer from the cart.
+ * @param {boolean} [props.showDescription=false] - Whether to show the offer description.
  */
 const InCartOffer = ({
-  item,
+  offer,
+  quantity,
   onIncrement,
   onDecrement,
   onQuantityChange,
   onRemove,
+  showDescription = false,
 }) => {
-  // Flash effects for different buttons
+  /**
+   * Custom hook to handle the flash effect on the minus button click.
+   * @type {Array}
+   */
   const [isFlashingPlus, triggerFlashPlus] = useFlashOnButtonClick(150);
+
+  /**
+   * Custom hook to handle the flash effect on the plus button click.
+   * @type {Array}
+   */
   const [isFlashingMinus, triggerFlashMinus] = useFlashOnButtonClick(150);
+
+  /**
+   * Custom hook to handle the flash effect on the trash button click.
+   * @type {Array}
+   */
   const [isFlashingTrash, triggerFlashTrash] = useFlashOnButtonClick(150);
 
   return (
     <div className='in-cart-offer' data-testid='in-cart-offer'>
       <div className='in-cart-offer-left'>
-        <h3>{item.offer.name}</h3>
-        <p>{item.offer.price} €</p>
+        <h3>{offer.name}</h3>
+        {showDescription && <p>{offer.description}</p>}
+        <p>{offer.price} €</p>
       </div>
       <div className='in-cart-offer-middle'>
         <button
           onMouseDown={() => triggerFlashMinus()}
-          onMouseUp={() => onDecrement(item.offer.id)}
+          onMouseUp={() => onDecrement(offer.id)}
           className={`button ${isFlashingMinus ? 'flash' : ''}`}
+          disabled={quantity <= 1}
         >
           –
         </button>
         <input
           type='number'
-          value={item.quantity}
+          value={quantity}
           min='0'
-          onChange={(e) => onQuantityChange(item.offer.id, e.target.value)}
+          onChange={(e) => onQuantityChange(offer.id, e.target.value)}
         />
         <button
           onMouseDown={() => triggerFlashPlus()}
-          onMouseUp={() => onIncrement(item.offer.id)}
+          onMouseUp={() => onIncrement(offer.id)}
           className={`button ${isFlashingPlus ? 'flash' : ''}`}
         >
           +
         </button>
       </div>
       <div className='in-cart-offer-right'>
-        <p>{item.offer.price * item.quantity} €</p>
+        <p>{offer.price * quantity} €</p>
         <button
           onMouseDown={() => triggerFlashTrash()}
           onMouseUp={() => {
@@ -86,7 +84,7 @@ const InCartOffer = ({
                 'Voulez-vous vraiment supprimer cette offre du panier ?'
               )
             ) {
-              onRemove(item.offer.id);
+              onRemove(offer.id);
             }
           }}
           className='remove-button'
