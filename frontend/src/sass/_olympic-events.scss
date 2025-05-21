@@ -6,15 +6,24 @@
   padding: 10px;
   margin: 0 auto;
   max-width: 90%;
+
+  .container {
+    @include mixins.flex-column;
+    margin: 0 auto;
+    max-width: 90%;
+    width: 90%;
+    border-radius: 5px;
+    border: variables.$border-light;
+    background-color: variables.$background-light;
+    margin-top: 20px;
+  }
 }
 
 .olympic-event {
   @include mixins.flex-column;
-  border: variables.$border-light;
   background-color: variables.$background-light;
   padding: 20px;
-  border-radius: 5px;
-  margin-bottom: 20px;
+  width: 90%;
 
   h3,
   .details {
@@ -50,7 +59,30 @@
   }
 
   .button {
+    display: flex;
+    justify-content: space-between;
     padding: 20px;
+  }
+}
+
+.olympic-event-accordion {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 90%;
+  margin-top: 10px;
+  height: 100%;
+  background-color: variables.$background-light;
+  color: variables.$text-dark;
+  padding: 10px;
+
+  .in-cart-offers,
+  .in-cart-offer {
+    width: 90%;
+  }
+  .add-offer-buttons {
+    display: flex;
+    justify-content: space-between;
   }
 }
 

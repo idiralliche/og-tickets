@@ -21,6 +21,11 @@ a.button {
   &.flash {
     animation: flashAnimation 0.15s forwards;
   }
+  &:disabled {
+    background-color: variables.$gold;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 // Flash animation for the buttons
