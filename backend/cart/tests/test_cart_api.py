@@ -7,57 +7,144 @@ from cart.models import Cart, CartItem
 from offers.models import Offer
 from olympic_events.models import OlympicEvent
 
-
 User = get_user_model()
 
 class CartAPITestCase(APITestCase):
     def setUp(self):
-        # Create a test user and authenticate
         self.user = User.objects.create_user(
             email='test@example.com',
             password='strong-password123'
         )
         self.client.force_authenticate(user=self.user)
-        # URLs
         self.list_url = reverse('cart-list')
 
     def test_list_requires_authentication(self):
-        # Logout to test unauthorized access
         self.client.force_authenticate(user=None)
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_post_creates_cart(self):
-        # Initially no carts
         self.assertEqual(Cart.objects.filter(custom_user=self.user).count(), 0)
         response = self.client.post(self.list_url, {})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # One cart created
         self.assertEqual(Cart.objects.filter(custom_user=self.user).count(), 1)
         cart = Cart.objects.get(custom_user=self.user)
         self.assertIsNone(cart.amount)
         self.assertIsNone(cart.ordered_at)
 
-    def test_checkout_creates_order_and_new_cart(self):
-        # Create a cart and add items
+    def test_add_cart_item(self):
         cart = Cart.objects.create(custom_user=self.user)
-        # Create offers and events
-        offer = Offer.objects.create(name='Test Offer', price=10.0)
-        event = OlympicEvent.objects.create(name='Test Event', date_time=timezone.now())
-        # Add items
+        offer = Offer.objects.create(name='Offre 1', price=15)
+        event = OlympicEvent.objects.create(name='Event 1', date_time=timezone.now())
+
+        url = reverse('cart-item-list')
+        payload = {
+            'offer_id': offer.id,
+            'olympic_event_id': event.id,
+            'quantity': 3,
+            'amount': 45,
+        }
+        response = self.client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        item = CartItem.objects.get(cart=cart, offer=offer, olympic_event=event)
+        self.assertEqual(item.quantity, 3)
+        self.assertEqual(float(item.amount), 45.0)
+
+    def test_update_cart_item_quantity(self):
+        cart = Cart.objects.create(custom_user=self.user)
+        offer = Offer.objects.create(name='Offre 2', price=20)
+        event = OlympicEvent.objects.create(name='Event 2', date_time=timezone.now())
+        item = CartItem.objects.create(cart=cart, offer=offer, olympic_event=event, quantity=1, amount=20)
+
+        url = reverse('cart-item-detail', args=[item.pk])
+        # PATCH avec le bon amount
+        response = self.client.patch(url, {'quantity': 4, 'amount': 80}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        item.refresh_from_db()
+        self.assertEqual(item.quantity, 4)
+        self.assertEqual(float(item.amount), 80.0)
+
+    def test_remove_cart_item(self):
+        cart = Cart.objects.create(custom_user=self.user)
+        offer = Offer.objects.create(name='Suppression', price=12)
+        event = OlympicEvent.objects.create(name='Suppression', date_time=timezone.now())
+        item = CartItem.objects.create(cart=cart, offer=offer, olympic_event=event, quantity=1, amount=12)
+
+        url = reverse('cart-item-detail', args=[item.pk])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(CartItem.objects.filter(pk=item.pk).exists())
+
+    def test_unique_constraint_cart_item(self):
+        cart = Cart.objects.create(custom_user=self.user)
+        offer = Offer.objects.create(name='Double', price=10)
+        event = OlympicEvent.objects.create(name='Double', date_time=timezone.now())
+        CartItem.objects.create(cart=cart, offer=offer, olympic_event=event, quantity=1, amount=10)
+
+        url = reverse('cart-item-list')
+        payload = {
+            'offer_id': offer.id,
+            'olympic_event_id': event.id,
+            'quantity': 2,
+            'amount': 20,
+        }
+        # Try to create duplicate item
+        response = self.client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('unique', str(response.data).lower())
+
+    def test_cart_item_detail_contains_objects(self):
+        cart = Cart.objects.create(custom_user=self.user)
+        offer = Offer.objects.create(name='Sérialisation', price=100)
+        event = OlympicEvent.objects.create(name='Sérialisation', date_time=timezone.now())
+        item = CartItem.objects.create(cart=cart, offer=offer, olympic_event=event, quantity=1, amount=100)
+
+        url = reverse('cart-item-detail', args=[item.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+        self.assertIn('offer', data)
+        self.assertIsInstance(data['offer'], dict)
+        self.assertEqual(data['offer']['id'], offer.id)
+
+    def test_cart_item_amount_validation(self):
+        cart = Cart.objects.create(custom_user=self.user)
+        offer = Offer.objects.create(name='Offre X', price=25)
+        event = OlympicEvent.objects.create(name='Event X', date_time=timezone.now())
+
+        url = reverse('cart-item-list')
+        # Montant correct
+        response = self.client.post(url, {
+            'offer_id': offer.id,
+            'olympic_event_id': event.id,
+            'quantity': 2,
+            'amount': 50.0,
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Montant incorrect
+        response = self.client.post(url, {
+            'offer_id': offer.id,
+            'olympic_event_id': event.id,
+            'quantity': 2,
+            'amount': 99.0,  # Faux
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('amount', response.data)
+
+    def test_checkout_creates_order_and_new_cart(self):
+        cart = Cart.objects.create(custom_user=self.user)
+        offer = Offer.objects.create(name='Checkout', price=10.0)
+        event = OlympicEvent.objects.create(name='Checkout Event', date_time=timezone.now())
         CartItem.objects.create(cart=cart, offer=offer, olympic_event=event, quantity=2, amount=20.0)
-        # Checkout URL
         checkout_url = reverse('cart-checkout', args=[cart.pk])
 
         response = self.client.post(checkout_url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # Refresh cart
         cart.refresh_from_db()
         self.assertIsNotNone(cart.ordered_at)
-        self.assertEqual(cart.amount, 40.0)
+        self.assertEqual(cart.amount, 20.0)
 
-        # A new open cart should be created
         open_carts = Cart.objects.filter(custom_user=self.user, ordered_at__isnull=True)
         self.assertEqual(open_carts.count(), 1)
 
