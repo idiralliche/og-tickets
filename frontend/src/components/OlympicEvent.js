@@ -6,7 +6,7 @@ import InCartOffersForOlympicEvent from './InCartOffersForOlympicEvent.js';
 import AddOfferButton from './AddOfferButton.js';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../utils/formatDate.js';
+import { formatDate } from '../utils/utils';
 
 /**
  * Component representing an Olympic event with its details and available offers.

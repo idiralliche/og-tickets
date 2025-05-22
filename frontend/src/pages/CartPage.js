@@ -6,7 +6,7 @@ import { useCartByOlympicEvent } from '../hooks/useCartByOlympicEvent';
 import { getOffers } from '../services/offersService';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.js';
-import { formatDate } from '../utils/formatDate.js';
+import { formatDate } from '../utils/utils.js';
 
 /**
  * Page component for displaying and managing the cart.

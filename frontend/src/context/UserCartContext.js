@@ -83,6 +83,7 @@ export const UserCartProvider = ({ children }) => {
       setCart([]);
       setCartMeta(null);
     }
+    // eslint-disable-next-line
   }, [isAuthenticated]);
 
   /**
@@ -201,6 +202,7 @@ export const UserCartProvider = ({ children }) => {
       setCartMeta(result);
       setCart([]); // New cart
       showNotification('Commande validée !', 'success', 3000);
+      refreshCart();
     } catch (e) {
       console.error(e);
       showNotification(e.message, 'error');

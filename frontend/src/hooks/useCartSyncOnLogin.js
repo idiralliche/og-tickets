@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { GuestCartContext } from '../context/GuestCartContext';
 import { useCartService } from '../hooks/useCartService';
 import { UserCartContext } from '../context/UserCartContext';
+import { extractId } from '../utils/utils';
 
 /**
  * Custom hook to merge the guest cart into the user cart upon login.
@@ -41,14 +42,6 @@ export function useCartSyncOnLogin() {
   const alreadyImported = useRef(false);
 
   /**
-   * Helper function to get the ID from an item object or use the item itself if it's already an ID.
-   * @param {Object|number} itemObj - The item object or ID.
-   * @returns {number} The ID of the item.
-   */
-  const getId = (itemObj) =>
-    typeof itemObj === 'object' && itemObj.id ? itemObj.id : itemObj;
-
-  /**
    * Effect to merge the guest cart into the user cart upon login.
    */
   useEffect(() => {
@@ -62,13 +55,13 @@ export function useCartSyncOnLogin() {
         for (const guestItem of guestCart) {
           if (!guestItem || !guestItem.offer || !guestItem.olympic_event)
             continue;
-          const guestOfferId = getId(guestItem.offer);
-          const guestOlympicEventId = getId(guestItem.olympic_event);
+          const guestOfferId = extractId(guestItem.offer);
+          const guestOlympicEventId = extractId(guestItem.olympic_event);
 
           const match = userCartItems.find(
             (i) =>
-              getId(i.offer) === guestOfferId &&
-              getId(i.olympic_event) === guestOlympicEventId
+              extractId(i.offer) === guestOfferId &&
+              extractId(i.olympic_event) === guestOlympicEventId
           );
 
           try {
@@ -84,8 +77,8 @@ export function useCartSyncOnLogin() {
             } else {
               // POST
               await addCartItem({
-                offer_id: getId(guestItem.offer),
-                olympic_event_id: getId(guestItem.olympic_event),
+                offer_id: extractId(guestItem.offer),
+                olympic_event_id: extractId(guestItem.olympic_event),
                 quantity: guestItem.quantity,
                 amount:
                   guestItem.amount ??
