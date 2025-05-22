@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     'olympic_events',
     'offers',
     'cart',
+    'order',
 ]
 """List of installed applications."""
 
