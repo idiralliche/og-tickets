@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Layout from '../components/layout/Layout';
 import InCartOffersForOlympicEvent from '../components/InCartOffersForOlympicEvent';
+import LoadingSpinner from '../components/LoadingSpinner';
 import AddOfferButton from '../components/AddOfferButton';
 import { useCartByOlympicEvent } from '../hooks/useCartByOlympicEvent';
 import { getOffers } from '../services/offersService';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.js';
 import { formatDate } from '../utils/utils.js';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Page component for displaying and managing the cart.
@@ -26,6 +28,9 @@ const CartPage = () => {
    */
   const [offers, setOffers] = useState([]);
 
+  const [offersLoading, setOffersLoading] = useState(true);
+  const [offersError, setOffersError] = useState('');
+
   /**
    * Context to check if the user is authenticated.
    * @type {boolean}
@@ -33,13 +38,32 @@ const CartPage = () => {
   const { isAuthenticated } = useContext(AuthContext);
 
   /**
+   * Hook to navigate
+   * @type {Function}
+   */
+  const navigate = useNavigate();
+
+  /**
    * Effect to load all offers when the component mounts.
    */
   useEffect(() => {
     let isMounted = true;
+    setOffersLoading(true);
+    setOffersError('');
     getOffers()
-      .then((data) => isMounted && setOffers(data))
-      .catch(() => isMounted && setOffers([]));
+      .then((data) => {
+        if (isMounted) {
+          setOffers(data);
+          setOffersLoading(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setOffers([]);
+          setOffersLoading(false);
+          setOffersError('Erreur lors du chargement des offres.');
+        }
+      });
     return () => {
       isMounted = false;
     };
@@ -52,7 +76,9 @@ const CartPage = () => {
       mainClassName='cart-page'
     >
       <h2>Contenu du panier</h2>
-      {olympicEvents.length === 0 ? (
+      {offersLoading ? (
+        <LoadingSpinner />
+      ) : olympicEvents.length === 0 ? (
         <p className='info-message'>Votre panier est vide.</p>
       ) : (
         <div className='cart-olympic-events-list'>
@@ -110,6 +136,7 @@ const CartPage = () => {
                   ? 'Créez un compte / connectez-vous pour passer commande'
                   : ''
               }
+              onClick={() => navigate('/finale')}
             >
               Passer commande
             </button>

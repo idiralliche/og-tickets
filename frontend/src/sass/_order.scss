@@ -1,0 +1,33 @@
+@use 'mixins';
+@use 'variables';
+
+.card-form {
+  @include mixins.flexbox-basics(column, center, center);
+  max-width: 50%;
+  padding: 10px;
+  margin: 10px auto;
+  align-self: center;
+
+  .StripeElement {
+    min-height: 100px;
+    width: 100%;
+    color: variables.$text-light;
+    background-color: variables.$border-light;
+    border-radius: 4px;
+    padding: 10px;
+
+    input {
+      padding: 20px;
+    }
+  }
+
+  .button {
+    margin: 10px auto;
+  }
+
+  @include mixins.media-min('tablet-up') {
+    .card-form {
+      max-width: 50%;
+    }
+  }
+}

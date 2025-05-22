@@ -203,6 +203,7 @@ export const UserCartProvider = ({ children }) => {
       setCart([]); // New cart
       showNotification('Commande validée !', 'success', 3000);
       refreshCart();
+      return result;
     } catch (e) {
       console.error(e);
       showNotification(e.message, 'error');

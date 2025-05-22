@@ -3,10 +3,11 @@ import { Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import OlympicEventsPage from './pages/OlympicEventsPage';
 import CartPage from './pages/CartPage';
-import AccountPage from './pages/AccountPage.js';
+import OrderPage from './pages/OrderPage';
+import AccountPage from './pages/AccountPage';
 import ActivationPage from './pages/ActivationPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage.js';
-import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage.js';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage';
 import UnauthenticatedOnly from './wrappers/UnauthenticatedOnly';
 import MemberOnly from './wrappers/MemberOnly';
 import { useCartSyncOnLogin } from './hooks/useCartSyncOnLogin';
@@ -57,6 +58,14 @@ const App = () => {
           <UnauthenticatedOnly redirectTo='/'>
             <AccountPage />
           </UnauthenticatedOnly>
+        }
+      />
+      <Route
+        path='/finale'
+        element={
+          <MemberOnly redirectTo='/acces'>
+            <OrderPage />
+          </MemberOnly>
         }
       />
     </Routes>
