@@ -14,7 +14,6 @@ class CartItemSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = CartItem
-    model = CartItem
     fields = [
       'id', 'cart',
       'offer', 'offer_id',
@@ -22,6 +21,29 @@ class CartItemSerializer(serializers.ModelSerializer):
       'quantity', 'amount'
     ]
     read_only_fields = ['id', 'cart', 'offer', 'olympic_event']
+
+    def validate(self, data):
+        """
+        Prevents duplicate items in the cart.
+        """
+        # Lors d'une création, self.instance est None
+        cart = self.context['request'].user.carts.filter(ordered_at__isnull=True).first()
+        offer = data.get('offer') or data.get('offer_id')
+        olympic_event = data.get('olympic_event') or data.get('olympic_event_id')
+        if cart and offer and olympic_event:
+            # Si update, ne pas tenir compte de soi-même
+            queryset = CartItem.objects.filter(
+                cart=cart,
+                offer=offer,
+                olympic_event=olympic_event
+            )
+            if self.instance:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise serializers.ValidationError({
+                    'non_field_errors': ["unique constraint: cart, offer, olympic_event"]
+                })
+        return data
 
   def validate(self, data):
     offer = data.get('offer') or getattr(self.instance, 'offer', None)
