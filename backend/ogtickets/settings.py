@@ -49,6 +49,11 @@ CORS_ALLOW_HEADERS = list(default_headers) + ['x-csrftoken']
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
 """Origins that are trusted for CSRF purposes."""
 
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -98,6 +103,7 @@ INSTALLED_APPS = [
     'offers',
     'cart',
     'order',
+    'payment',
 ]
 """List of installed applications."""
 
@@ -270,6 +276,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+# ====================== #
+#  CELERY & BACKGROUND TASKS
+# ====================== #
+
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'sk_test_123:#mockedstripe!456$dummysecretkey;789')
 
 # ====================== #
 #  CELERY & BACKGROUND TASKS

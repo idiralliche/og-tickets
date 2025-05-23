@@ -27,6 +27,7 @@ x-common-secrets: &common-secrets
   - sentry_dsn
   - email_host
   - email_host_password
+  - stripe_secret_key
 
 services:
   redis:
@@ -111,6 +112,8 @@ secrets:
   email_host_password:
     external: true
   sentry_dsn:
+    external: true
+  stripe_secret_key:
     external: true
 
 networks:
