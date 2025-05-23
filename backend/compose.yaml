@@ -33,6 +33,7 @@ x-common-volumes: &common-volumes
   - ./secrets/allowed_hosts.txt:/run/secrets/allowed_hosts:ro
   - ./secrets/cors_allowed_origins.txt:/run/secrets/cors_allowed_origins:ro
   - ./secrets/sentry_dsn.txt:/run/secrets/sentry_dsn:ro
+  - ./secrets/stripe_secret_key.txt:/run/secrets/stripe_secret_key:ro
   - ./secrets/email_host.txt:/run/secrets/email_host:ro
   - ./secrets/email_host_password.txt:/run/secrets/email_host_password:ro
 

@@ -37,6 +37,8 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path('olympic_events/', include('olympic_events.urls')),
     path('offers/', include('offers.urls')),
     path('cart/', include('cart.urls')),
+    path('order/', include('order.urls')),
+    path('payment/', include('payment.urls')),
     
     # Authentication API endpoints
     path('auth/', include([

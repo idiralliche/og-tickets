@@ -66,3 +66,18 @@ export const getOlympicEvents = async () => {
     throw error;
   }
 };
+
+export async function getOlympicEventById(id) {
+  if (!id) throw new Error("Id d'épreuve manquant !");
+  const url =
+    process.env.REACT_APP_BACKEND_BASE_URL +
+    process.env.REACT_APP_OLYMPIC_EVENTS_PATH +
+    id +
+    '/';
+
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('Erreur lors de la récupération de l’épreuve');
+  const data = await resp.json();
+
+  return data;
+}

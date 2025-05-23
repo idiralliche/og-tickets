@@ -18,15 +18,6 @@ const NavLinks = ({ onLinkClick }) => {
             Les épreuves
           </Link>
         </li>
-        <li>
-          <Link
-            data-testid='nav-link-offers'
-            to='/offres'
-            onClick={onLinkClick}
-          >
-            Nos offres
-          </Link>
-        </li>
       </ul>
       <ul className='nav-links'>
         <li>

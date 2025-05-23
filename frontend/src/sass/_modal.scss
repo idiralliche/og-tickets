@@ -1,0 +1,45 @@
+@use 'mixins';
+@use 'variables';
+
+.booking-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(46, 0, 77, 0.6);
+  z-index: 1000;
+  @include mixins.flexbox-basics(column, center, center);
+  animation: fadeIn 0.3s;
+}
+
+.booking-modal {
+  background: variables.$background-light;
+  padding: 2rem 2.5rem 2rem 2rem;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+  color: variables.$text-dark;
+}
+
+.booking-modal h2 {
+  color: variables.$text-dark;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1.3rem;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: variables.$text-dark;
+  cursor: pointer;
+  transition: color 0.2s;
+  z-index: 10;
+  &:hover {
+    color: variables.$gold;
+  }
+}
