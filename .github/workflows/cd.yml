@@ -24,7 +24,7 @@ defaults:
 jobs:
   deploy:
     runs-on: self-hosted
-     steps:
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
