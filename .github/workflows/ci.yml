@@ -26,14 +26,35 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           sparse-checkout: |
             backend
             .github
 
+      - name: Cache .git directory
+        id: cache-git
+        uses: actions/cache@v3
+        with:
+          path: /home/ubuntu/og-tickets/.git
+          key: git-cache-${{ github.sha }}
+          restore-keys: |
+            git-cache-
+
+      - name: Pull latest version of the repository
+        run: |
+          echo "Mise à jour du dépôt depuis origin/main..."
+          git fetch origin main --depth=1 || (echo "Erreur lors de la récupération des mises à jour depuis origin/main." && exit 1)
+          git reset --hard origin/main || (echo "Erreur lors de la mise à jour du dépôt avec git reset --hard." && exit 1)
+          git read-tree -mu HEAD
+          echo "Dépôt mis à jour avec succès."
+
       - name: Verify repository state
         run: |
-          "$SCRIPTS_PATH/verify-git-state.sh"
+          if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+            echo "Erreur : Le dépôt n'est pas valide."
+            exit 1
+          fi
+          echo "Le dépôt est valide et prêt à être utilisé."
 
   init-docker:
     runs-on: self-hosted
@@ -84,10 +105,9 @@ jobs:
           echo "${{ secrets.ALLOWED_HOSTS }}" > "allowed_hosts.txt" || file_creation_error "allowed_hosts.txt"
           echo "${{ secrets.CORS_ALLOWED_ORIGINS }}" > "cors_allowed_origins.txt" || file_creation_error "cors_allowed_origins.txt"
           echo "${{ secrets.SENTRY_DSN }}" > "sentry_dsn.txt" || file_creation_error "sentry_dsn.txt"
-          echo "${{ secrets.STRIPE_SECRET_KEY }}" > "stripe_secret_key.txt" || file_creation_error "stripe_secret_key.txt"
           echo "${{ secrets.EMAIL_HOST }}" > "email_host.txt" || file_creation_error "email_host.txt"
           echo "${{ secrets.EMAIL_HOST_PASSWORD }}" > "email_host_password.txt" || file_creation_error "email_host_password.txt"
-          for file in secret_key db_user db_password db_name db_host allowed_hosts cors_allowed_origins sentry_dsn email_host email_host_password stripe_secret_key; do
+          for file in secret_key db_user db_password db_name db_host allowed_hosts cors_allowed_origins sentry_dsn email_host email_host_password; do
             chmod 600 "${SECRETS_DIR}/${file}.txt"
             echo "Vérification de la création du fichier ${file}.txt..."
             ${SCRIPTS_PATH}/check-file-creation.sh "${SECRETS_DIR}" "${file}.txt"
