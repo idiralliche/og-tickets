@@ -15,6 +15,7 @@ dist/
 
 # Ignore Python compiled files
 staticfiles/
+django_staticfiles/
 
 # misc
 venv/

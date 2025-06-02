@@ -267,14 +267,14 @@ USE_TZ = True
 #  STATIC & MEDIA FILES  #
 # ====================== #
 
-STATIC_URL = "/static/"
+STATIC_URL = "/django-static/"
 """URL prefix for static files."""
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'django_staticfiles')
 """Absolute path to collect static files."""
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "/django-static/"),
 ]
 
 # ====================== #
