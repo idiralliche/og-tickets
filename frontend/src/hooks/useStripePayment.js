@@ -14,7 +14,6 @@ export function useStripePayment() {
       const res = await secureFetch(`${BASE_URL}/create/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ amount, currency }),
       });
       if (!res.ok)

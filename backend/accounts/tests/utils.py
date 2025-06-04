@@ -2,10 +2,6 @@ from django.core import mail
 from django.contrib.auth import get_user_model
 from django.test.client import Client
 
-def get_csrf_token(client: Client) -> str:
-    client.get('/api/auth/csrf/')
-    return client.cookies['csrftoken'].value
-
 
 def create_test_user (
         email:str,

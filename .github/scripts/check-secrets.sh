@@ -5,7 +5,7 @@ set -euo pipefail
 
 # List of required secrets
 readonly SECRETS=(
-  "secret_key" "db_user" "db_password" "db_name" "db_host" "allowed_hosts" "cors_allowed_origins"
+  "secret_key" "db_user" "db_password" "db_name" "db_host" "allowed_hosts"
   "sentry_dsn" "email_host" "email_host_password" "stripe_secret_key"
 )
 

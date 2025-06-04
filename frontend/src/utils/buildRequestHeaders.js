@@ -1,5 +1,3 @@
-import { getCSRFToken } from './csrf';
-
 /**
  * Builds and validates request headers for secure API requests.
  * @function
@@ -9,7 +7,7 @@ import { getCSRFToken } from './csrf';
  * @param {string} [options.accessToken] - Access token for authorization.
  * @param {string} [options.contentType='application/json'] - Content type for the request.
  * @returns {Object} The constructed headers object.
- * @throws {Error} If required tokens (accessToken or CSRF token) are missing.
+ * @throws {Error} If required tokens (accessToken) are missing.
  */
 export function buildRequestHeaders({
   headers = {},
@@ -44,17 +42,6 @@ export function buildRequestHeaders({
       );
     }
     outHeaders['Authorization'] = `Bearer ${accessToken}`;
-  }
-
-  // Add CSRF token header if missing
-  if (missingHeaders.includes('x-csrftoken')) {
-    const csrfToken = getCSRFToken();
-    if (!csrfToken) {
-      throw new Error(
-        'CSRF token manquant : impossible d’effectuer une requête sécurisée.'
-      );
-    }
-    outHeaders['X-CSRFToken'] = csrfToken;
   }
 
   // Add Content-Type header if missing

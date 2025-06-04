@@ -8,7 +8,7 @@ x-common-env: &common-env
     EMAIL_HOST_USER: noreply@ogtickets.space
     EMAIL_PORT: 587
     DEFAULT_FROM_EMAIL: "Ne pas répondre - comptes utilisateur <noreply@ogtickets.space>"
-    FRONTEND_DOMAIN: localhost:8080
+    FRONTEND_DOMAIN: localhost:8000
     USERS_ACTIVATION_ROUTE: "acces/ouverture"
     USERS_PASSWORD_RESET_ROUTE: "acces/reprise"
     REDIS_URL: redis://redis:6379/0
@@ -18,7 +18,6 @@ x-common-env: &common-env
     DB_NAME: ${DB_NAME}
     DB_HOST: ${DB_HOST}
     ALLOWED_HOSTS: ${ALLOWED_HOSTS}
-    CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
     SENTRY_DSN: ${SENTRY_DSN}
     EMAIL_HOST: ${EMAIL_HOST}
     EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
@@ -31,7 +30,6 @@ x-common-volumes: &common-volumes
   - ./secrets/db_name.txt:/run/secrets/db_name:ro
   - ./secrets/db_host.txt:/run/secrets/db_host:ro
   - ./secrets/allowed_hosts.txt:/run/secrets/allowed_hosts:ro
-  - ./secrets/cors_allowed_origins.txt:/run/secrets/cors_allowed_origins:ro
   - ./secrets/sentry_dsn.txt:/run/secrets/sentry_dsn:ro
   - ./secrets/stripe_secret_key.txt:/run/secrets/stripe_secret_key:ro
   - ./secrets/email_host.txt:/run/secrets/email_host:ro
@@ -61,7 +59,7 @@ services:
   backend:
     image: tixidest/ogtickets-backend:latest
     ports:
-      - "8000:8000"
+      - "8001:8000"
     restart: unless-stopped
     environment:
       <<: *common-env

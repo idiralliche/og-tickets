@@ -23,7 +23,7 @@ export const AuthContext = createContext({
 
 /**
  * Provider component that manages authentication state and provides it to the application.
- * Handles session persistence and CSRF protection.
+ * Handles session persistence and token refresh.
  *
  * @component
  * @param {Object} props - Component props
@@ -38,7 +38,6 @@ export const AuthContext = createContext({
  * @description
  * Features include:
  * - Session initialization on app load
- * - CSRF token management
  * - Access token refresh handling
  * - Memory-only token storage for security
  * - Loading state during initialization
@@ -83,17 +82,9 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Initialize CSRF protection and auth state on mount
+  // Initialize authentication state on mount
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}api/auth/csrf/`, {
-      credentials: 'include',
-    })
-      .catch(() => {
-        /* ignore CSRF error */
-      })
-      .finally(() => {
-        initializeAuth();
-      });
+    initializeAuth();
   }, [initializeAuth]);
 
   /**
