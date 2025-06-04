@@ -1,5 +1,4 @@
 import { makeAuthPostRequest } from '../utils/authRequest';
-import { buildCSRFHeaders } from '../utils/csrf';
 
 // User Management
 export const authService = {
@@ -27,7 +26,7 @@ export const authService = {
     let pending = null;
     return () => {
       if (pending) return pending;
-      pending = makeAuthPostRequest('jwt/refresh', {}, 'Refresh')
+      pending = makeAuthPostRequest('jwt/refresh', {}, 'Refresh', true)
         .catch((err) => {
           if (err.message.includes('Refresh token absent')) {
             return {};
@@ -47,7 +46,10 @@ export const authService = {
       {
         method: 'POST',
         credentials: 'include',
-        headers: buildCSRFHeaders({ Authorization: `Bearer ${accessToken}` }),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
       }
     );
   },

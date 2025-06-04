@@ -6,28 +6,8 @@ from accounts.views import (
     CustomTokenRefreshView,
     LogoutView,
 )
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.http import JsonResponse
 from typing import List, Union
 from django.urls.resolvers import URLPattern, URLResolver
-
-def get_csrf(request) -> JsonResponse:
-    """CSRF token endpoint handler.
-    
-    Generates and sets CSRF token cookie while returning minimal JSON response.
-    
-    Args:
-        request: HttpRequest object
-        
-    Returns:
-        JsonResponse: Always returns {'detail': 'CSRF token set'} with:
-            - CSRF cookie set via ensure_csrf_cookie decorator
-            - 200 status code
-            
-    Security:
-        Decorated with ensure_csrf_cookie to guarantee token generation
-    """
-    return JsonResponse({'detail': 'CSRF token set'})
 
 router = DefaultRouter()
 router.register(r'users', CustomUserViewSet, basename='users')
@@ -52,8 +32,5 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
         
         # Custom user management routes
         path('', include(router.urls)),
-        
-        # Security endpoints
-        path('csrf/', ensure_csrf_cookie(get_csrf), name='csrf-token'),
     ]))
 ]

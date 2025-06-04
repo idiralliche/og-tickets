@@ -6,7 +6,7 @@ x-common-env: &common-env
   EMAIL_HOST_USER: noreply@ogtickets.space
   EMAIL_PORT: 587
   DEFAULT_FROM_EMAIL: 'Ne pas répondre - comptes utilisateur <noreply@ogtickets.space>'
-  FRONTEND_DOMAIN: og-tickets.vercel.app
+  FRONTEND_DOMAIN: ogtickets.space
   USERS_ACTIVATION_ROUTE: 'acces/ouverture'
   USERS_PASSWORD_RESET_ROUTE: 'acces/reprise'
   REDIS_URL: redis://redis:6379/0
@@ -23,7 +23,6 @@ x-common-secrets: &common-secrets
   - db_name
   - db_host
   - allowed_hosts
-  - cors_allowed_origins
   - sentry_dsn
   - email_host
   - email_host_password
@@ -104,8 +103,6 @@ secrets:
   db_password:
     external: true
   allowed_hosts:
-    external: true
-  cors_allowed_origins:
     external: true
   email_host:
     external: true

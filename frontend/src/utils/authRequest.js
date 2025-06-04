@@ -1,5 +1,3 @@
-import { buildCSRFHeaders } from './csrf';
-
 /**
  * Base URL for authentication-related API endpoints
  * @constant {string}
@@ -7,7 +5,7 @@ import { buildCSRFHeaders } from './csrf';
 const API_AUTH_URL = `${process.env.REACT_APP_BACKEND_BASE_URL}api/auth/`;
 
 /**
- * Handles authentication-related API requests with CSRF protection
+ * Handles authentication-related API POST requests
  * @private
  * @param {string} endpoint - API endpoint suffix
  * @param {Object} data - Payload to send with the request
@@ -18,7 +16,8 @@ const API_AUTH_URL = `${process.env.REACT_APP_BACKEND_BASE_URL}api/auth/`;
 export const makeAuthPostRequest = async (
   endpoint,
   data,
-  action = 'Request'
+  action = 'Request',
+  withCredentials = false
 ) => {
   if (!endpoint.endsWith('/')) {
     endpoint = endpoint + '/';
@@ -27,8 +26,8 @@ export const makeAuthPostRequest = async (
   try {
     const response = await fetch(`${API_AUTH_URL}${endpoint}`, {
       method: 'POST',
-      credentials: 'include',
-      headers: buildCSRFHeaders(),
+      ...(withCredentials ? { credentials: 'include' } : {}),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
 

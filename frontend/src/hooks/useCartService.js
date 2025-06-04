@@ -28,9 +28,7 @@ export const useCartService = () => {
    * @returns {Promise<Object>} The current cart.
    */
   const getCurrentCart = useCallback(async () => {
-    const res = await secureFetch(`${BASE_URL}/`, {
-      credentials: 'include',
-    });
+    const res = await secureFetch(`${BASE_URL}/`, {});
     if (!res.ok) {
       throw new Error(
         `Erreur ${res.status} lors de la récupération du panier.`
@@ -46,9 +44,7 @@ export const useCartService = () => {
    * @returns {Promise<Array>} The items in the cart.
    */
   const getCartItems = useCallback(async () => {
-    const res = await secureFetch(`${BASE_URL}/items/`, {
-      credentials: 'include',
-    });
+    const res = await secureFetch(`${BASE_URL}/items/`, {});
     if (!res.ok) {
       throw new Error(
         `Erreur ${res.status} lors de la récupération des lignes du panier.`
@@ -78,7 +74,6 @@ export const useCartService = () => {
 
       const res = await secureFetch(`${BASE_URL}/items/`, {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           offer_id,
@@ -122,7 +117,6 @@ export const useCartService = () => {
       await updateCartItemSchema.validate(body);
       const res = await secureFetch(`${BASE_URL}/items/${id}/`, {
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
@@ -144,7 +138,6 @@ export const useCartService = () => {
     async (id) => {
       const res = await secureFetch(`${BASE_URL}/items/${id}/`, {
         method: 'DELETE',
-        credentials: 'include',
       });
       if (!res.ok) {
         throw new Error(
@@ -164,7 +157,6 @@ export const useCartService = () => {
     async (cartId) => {
       const res = await secureFetch(`${BASE_URL}/${cartId}/checkout/`, {
         method: 'POST',
-        credentials: 'include',
       });
       if (!res.ok) {
         const err = await res.json();

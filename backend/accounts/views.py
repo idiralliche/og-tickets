@@ -1,7 +1,5 @@
 from typing import Optional, Any
 from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -10,7 +8,7 @@ from rest_framework.request import Request
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from djoser.views import UserViewSet as DjoserUserViewSet
-from .tasks import send_password_reset_email_task, send_password_reset_email_task
+from .tasks import send_password_reset_email_task
 from .models import CustomUser
 
 # Cookie configuration constants from settings
@@ -84,14 +82,12 @@ class CookieHandler:
         """
         return len(token.split('.')) == 3
 
-@method_decorator(csrf_protect, name='dispatch')
 class CustomTokenObtainPairView(TokenObtainPairView):
     """Custom JWT authentication endpoint with secure cookie handling.
     
     Extends standard TokenObtainPairView to:
     - Store refresh token in HttpOnly cookie
     - Return only access token in response body
-    - Apply CSRF protection
     """
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
@@ -113,7 +109,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         return response
 
-@method_decorator(csrf_protect, name='dispatch')
 class CustomTokenRefreshView(TokenRefreshView):
     """Custom JWT refresh endpoint with cookie-based token handling.
     
@@ -193,12 +188,10 @@ class LogoutView(APIView):
 
         return response
 
-@method_decorator(csrf_protect, name='dispatch')
 class CustomUserViewSet(DjoserUserViewSet):
     """Extended user management ViewSet with custom password reset.
     
     Maintains all Djoser functionality while adding:
-    - CSRF protection
     - Celery-powered password reset
     - Relaxed permissions for password reset
     """

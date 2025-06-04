@@ -1,7 +1,6 @@
 import os
 import sentry_sdk
 from datetime import timedelta
-from corsheaders.defaults import default_headers
 
 # ====================== #
 #      CORE SETTINGS     #
@@ -34,24 +33,7 @@ ALLOWED_HOSTS = [
 ]
 """List of allowed hostnames for security."""
 
-CORS_ALLOWED_ORIGINS = [
-    f"{SCHEME}://{host}" for host in 
-    os.getenv('CORS_ALLOWED_ORIGINS', 'localhost,127.0.0.1,[::1]').split(',')
-]
-"""List of allowed origins for CORS."""
-
-CORS_ALLOW_CREDENTIALS = True
-"""Allow cookies in cross-origin requests."""
-
-CORS_ALLOW_HEADERS = list(default_headers) + ['x-csrftoken']
-"""Additional allowed headers for CORS requests."""
-
-CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
-"""Origins that are trusted for CSRF purposes."""
-
-CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -94,7 +76,6 @@ INSTALLED_APPS = [
     # Third-party apps
     'rest_framework',
     'djoser',
-    'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     
     # Project apps
@@ -109,8 +90,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -207,7 +187,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_SECURE': True,
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/api/auth/jwt/refresh/', 
-    'AUTH_COOKIE_SAMESITE': 'None',
+    'AUTH_COOKIE_SAMESITE': 'Lax',
 }
 """Configuration for Simple JWT authentication."""
 
@@ -267,15 +247,13 @@ USE_TZ = True
 #  STATIC & MEDIA FILES  #
 # ====================== #
 
-STATIC_URL = "/django-static/"
+STATIC_URL = "/static/"
 """URL prefix for static files."""
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'django_staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 """Absolute path to collect static files."""
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "/django-static/"),
-]
+STATICFILES_DIRS = []
 
 # ====================== #
 #  CELERY & BACKGROUND TASKS

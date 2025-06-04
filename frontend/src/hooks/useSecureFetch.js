@@ -21,7 +21,7 @@ export const useSecureFetch = () => {
       // Ensure headers exist and add the Authorization header.
       options.headers = buildRequestHeaders({
         headers: options.headers,
-        expectedHeaders: ['x-csrftoken', 'authorization'],
+        expectedHeaders: ['authorization'],
         accessToken,
       });
 
