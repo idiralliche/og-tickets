@@ -127,7 +127,7 @@ jobs:
 
       - name: Create Docker secrets
         run: |
-          for secret in secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password; do
+          for secret in secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password stripe_secret_key; do
             docker secret create ${secret} "${SECRETS_DIR}/${secret}.txt"
           done
 
