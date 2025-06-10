@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function OrderConfirmation({ order }) {
   if (!order) return <div>Aucune commande à afficher.</div>;
@@ -19,6 +20,9 @@ export default function OrderConfirmation({ order }) {
         <br />
         Commandé le {new Date(order.created_at).toLocaleString('fr-FR')}
       </div>
+      <Link className='button' to='/'>
+        Retour à l'accueil
+      </Link>
     </div>
   );
 }

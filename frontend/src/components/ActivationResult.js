@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner.js';
 import { GiPodiumWinner } from 'react-icons/gi';
 import { TbBikeOff } from 'react-icons/tb';
@@ -26,6 +26,17 @@ import { TbBikeOff } from 'react-icons/tb';
  * - Includes test IDs for testing purposes
  */
 const ActivationResult = ({ status }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === 'success') {
+      const timer = setTimeout(() => {
+        navigate('/acces');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, navigate]);
+
   switch (status) {
     case 'pending':
       return <LoadingSpinner />;

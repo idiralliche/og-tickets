@@ -8,7 +8,13 @@ import StripeWrapper from '../wrappers/StripeWrapper';
 export default function OrderPage() {
   // step: 'summary' | 'payment' | 'confirmation'
   const [step, setStep] = useState('summary');
-  const [orderData, setOrderData] = useState(null); // données de commande confirmée
+  const [orderData, setOrderData] = useState(null);
+
+  const subtitles = {
+    summary: 'Vérifiez le récapitulatif de votre commande.',
+    payment: 'Entrez vos informations de paiement pour valider votre commande',
+    confirmation: 'Votre commande a été validée.',
+  };
 
   // Quand l'utilisateur clique sur "Valider la commande" dans OrderSummary
   const handleSummaryValidate = () => setStep('payment');
@@ -20,10 +26,7 @@ export default function OrderPage() {
   };
 
   return (
-    <Layout
-      title='Validation de la commande'
-      subtitle='Entrez vos informations de paiement pour valider votre commande'
-    >
+    <Layout title='Validation de la commande' subtitle={subtitles[step]}>
       {step === 'summary' && (
         <OrderSummary onValidate={handleSummaryValidate} />
       )}
