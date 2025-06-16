@@ -99,7 +99,8 @@ jobs:
           echo "${{ secrets.STRIPE_SECRET_KEY }}" > "stripe_secret_key.txt" || file_creation_error "stripe_secret_key.txt"
           echo "${{ secrets.EMAIL_HOST }}" > "email_host.txt" || file_creation_error "email_host.txt"
           echo "${{ secrets.EMAIL_HOST_PASSWORD }}" > "email_host_password.txt" || file_creation_error "email_host_password.txt"
-          for file in secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password stripe_secret_key; do
+          echo "${{ secrets.TICKET_ENCRYPTION_KEY }}" > "ticket_encryption_key.txt" || file_creation_error "ticket_encryption_key.txt"
+          for file in secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password stripe_secret_key ticket_encryption_key; do
             chmod 600 "${SECRETS_DIR}/${file}.txt"
             echo "Vérification de la création du fichier ${file}.txt..."
             ${SCRIPTS_PATH}/check-file-creation.sh "${SECRETS_DIR}" "${file}.txt"
@@ -127,7 +128,7 @@ jobs:
 
       - name: Create Docker secrets
         run: |
-          for secret in secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password stripe_secret_key; do
+          for secret in secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password stripe_secret_key ticket_encryption_key; do
             docker secret create ${secret} "${SECRETS_DIR}/${secret}.txt"
           done
 
