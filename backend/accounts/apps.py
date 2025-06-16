@@ -62,6 +62,11 @@ class AccountsConfig(AppConfig):
             
         Note:
             Executes confirmation email task immediately via Celery
+            Generates and encrypts user key if not already set
         """
+        from utils.encryption import generate_and_encrypt_key
+        if not user.user_key:
+            user.user_key = generate_and_encrypt_key()
+            user.save(update_fields=['user_key'])
         from .tasks import send_confirmation_email_task
         send_confirmation_email_task.delay(user.id)

@@ -43,6 +43,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Identification fields
     id = models.BigAutoField(primary_key=True)
     email = models.EmailField(unique=True)
+    user_key = models.CharField(max_length=512, blank=True, null=True, help_text="AES-GCM encrypted personal user key (base64)")
 
     # Personal info
     first_name = models.CharField(max_length=150, blank=True)
