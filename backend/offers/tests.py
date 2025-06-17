@@ -11,12 +11,14 @@ class OfferAPITests(APITestCase):
         self.offer1 = Offer.objects.create(
             name="Solo",
             description="1 ticket pour une personne",
-            price=50.00
+            price=50.00,
+            nb_place=1
         )
         self.offer2 = Offer.objects.create(
             name="Duo",
             description="1 ticket pour deux personnes",
-            price=90.00
+            price=90.00,
+            nb_place=2
         )
 
     def test_get_offers(self):
@@ -38,6 +40,15 @@ class OfferAPITests(APITestCase):
             self.assertIn('name', offer)
             self.assertIn('description', offer)
             self.assertIn('price', offer)
+            self.assertIn('nb_place', offer)
+
+        ids = [o['id'] for o in data]
+        if self.offer1.id in ids:
+            solo = [o for o in data if o['id'] == self.offer1.id][0]
+            self.assertEqual(solo['nb_place'], 1)
+        if self.offer2.id in ids:
+            duo = [o for o in data if o['id'] == self.offer2.id][0]
+            self.assertEqual(duo['nb_place'], 2)
 
     def test_offer_str(self):
         """

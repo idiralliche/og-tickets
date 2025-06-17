@@ -5,7 +5,8 @@
         "fields": {
             "name": "Solo",
             "description": "1 ticket pour une personne",
-            "price": 50
+            "price": 50,
+            "nb_place": 1
         }
     },
     {
@@ -14,7 +15,8 @@
         "fields": {
             "name": "Duo",
             "description": "1 ticket pour deux personnes",
-            "price": 90
+            "price": 90,
+            "nb_place": 2
         }
     },
     {
@@ -23,7 +25,8 @@
         "fields": {
             "name": "Famille",
             "description": "1 ticket pour 4 personnes",
-            "price": 160
+            "price": 160,
+            "nb_place": 4
         }
     }
 ]
