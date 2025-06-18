@@ -34,6 +34,7 @@ x-common-volumes: &common-volumes
   - ./secrets/stripe_secret_key.txt:/run/secrets/stripe_secret_key:ro
   - ./secrets/email_host.txt:/run/secrets/email_host:ro
   - ./secrets/email_host_password.txt:/run/secrets/email_host_password:ro
+  - ./secrets/ticket_encryption_key.txt:/run/secrets/ticket_encryption_key:ro
 
 services:
   db:

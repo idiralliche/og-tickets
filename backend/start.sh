@@ -8,7 +8,7 @@ shift
 if [[ "$mode" == "django" || "$mode" == "celery" ]]; then
   echo "Chargement des secrets Docker..."
   # Required secrets as space-separated list
-  secrets="stripe_secret_key secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password"
+  secrets="ticket_encryption_key stripe_secret_key secret_key db_user db_password db_name db_host allowed_hosts sentry_dsn email_host email_host_password"
 
   # Load secrets from /run/secrets/ and export them as environment variables
   for secret in $secrets; do
