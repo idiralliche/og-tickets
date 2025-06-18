@@ -2,6 +2,7 @@
 x-common-env: &common-env
   ENV: prod
   DEBUG: 'false'
+  CSRF_TRUSTED_ORIGIN: 'https://ogtickets.space'
   EMAIL_USE_TLS: 'true'
   EMAIL_HOST_USER: noreply@ogtickets.space
   EMAIL_PORT: 587
@@ -27,7 +28,9 @@ x-common-secrets: &common-secrets
   - email_host
   - email_host_password
   - stripe_secret_key
+  - stripe_webhook_secret
   - ticket_encryption_key
+  - ticket_hmac_key
 
 services:
   redis:
@@ -113,7 +116,11 @@ secrets:
     external: true
   stripe_secret_key:
     external: true
+  stripe_webhook_secret:
+    external: true
   ticket_encryption_key:
+    external: true
+  ticket_hmac_key:
     external: true
 
 networks:

@@ -34,7 +34,13 @@ ALLOWED_HOSTS = [
 """List of allowed hostnames for security."""
 
 CSRF_COOKIE_SECURE = True
+"""Use secure cookies for CSRF protection in production."""
+
 SESSION_COOKIE_SECURE = True
+"""Use secure cookies for session management in production."""
+
+CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_TRUSTED_ORIGIN', 'http://localhost:8000')]
+"""Trusted origins for CSRF protection."""
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -115,6 +121,7 @@ TEMPLATES = [
         },
     },
 ]
+"""Template engine configuration for rendering HTML templates."""
 
 ROOT_URLCONF = "ogtickets.urls"
 """Root URL configuration for the project."""
@@ -254,12 +261,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 """Absolute path to collect static files."""
 
 STATICFILES_DIRS = []
+"""Additionnal directories to search for static files."""
 
 # ====================== #
-#  CELERY & BACKGROUND TASKS
+#  STRIPE PAYMENT SETTINGS
 # ====================== #
 
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'sk_test_123:#mockedstripe!456$dummysecretkey;789')
+"""Stripe secret key for payment processing."""
+
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', 'whsec_1234567890abcdefg')
+"""Stripe webhook secret for verifying webhook events."""
 
 # ====================== #
 #  CELERY & BACKGROUND TASKS
