@@ -1,9 +1,12 @@
 import stripe
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from order.models import Order
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -32,3 +35,32 @@ def create_payment_intent(request):
         })
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError:
+        return Response(status=400)
+    except stripe.error.SignatureVerificationError:
+        return Response(status=400)
+
+    # Successful payment event handling
+    if event['type'] == 'payment_intent.succeeded':
+        intent = event['data']['object']
+        user_id = intent['metadata'].get('user_id')
+        order = Order.objects.filter(user_id=user_id, status='pending').order_by('-created_at').first()
+        if order:
+            order.status = 'paid'
+            order.paid_at = timezone.now()
+            order.save(update_fields=['status', 'paid_at'])
+
+    return Response(status=200)
