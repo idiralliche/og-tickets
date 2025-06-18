@@ -3,12 +3,10 @@ from .models import Order
 from .serializers import OrderSerializer
 
 class OrderViewSet(viewsets.ReadOnlyModelViewSet):
-  """
-  Permet à l'utilisateur connecté de voir ses commandes.
-  """
+  """Allows authenticated users to view their odrers."""
   serializer_class = OrderSerializer
   permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
-    # Retourne uniquement les commandes de l'utilisateur connecté
+    # Only return orders for the authenticated user
     return Order.objects.filter(user=self.request.user)
