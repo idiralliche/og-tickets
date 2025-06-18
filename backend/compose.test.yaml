@@ -35,6 +35,8 @@ services:
       CELERY_TASK_EAGER_PROPAGATES: "True"
       CELERY_BROKER_URL: "redis://redis:6379/0"
       CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+      TICKET_ENCRYPTION_KEY: "psQGkS5mfCr9AIX6DyUoQk7XB5b7IacKL8c+xWyGDzs="
+      TICKET_HMAC_KEY: "KKeKVi00q/a1FmYWxpR8alndUr+PThtKPAvFA5v36DY="
     depends_on:
       - db
       - redis

@@ -139,8 +139,8 @@ class CartAPITestCase(APITestCase):
         """
         Test validation of the amount field in a cart item.
         """
-        cart = Cart.objects.create(custom_user=self.user)
         offer = Offer.objects.create(name='Offre X', price=25)
+        offer2 = Offer.objects.create(name='Offre Y', price=30)
         event = OlympicEvent.objects.create(name='Event X', date_time=timezone.now())
 
         url = reverse('cart-item-list')
@@ -154,7 +154,7 @@ class CartAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Incorrect amount
         response = self.client.post(url, {
-            'offer_id': offer.id,
+            'offer_id': offer2.id,
             'olympic_event_id': event.id,
             'quantity': 2,
             'amount': 99.0,  # Incorrect
