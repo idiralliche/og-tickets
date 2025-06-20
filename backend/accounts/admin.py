@@ -23,7 +23,7 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('email', 'password', 'user_key')}),
         ('Informations personnelles', {'fields': ('first_name', 'last_name')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Dates importantes', {'fields': ('last_login', 'date_joined')}),
+        ('Dates importantes', {'fields': ('last_login', 'created_at')}),
         ('Champs personnalisés', {'fields': ('deleted_at', 'role')}),
     )
 
