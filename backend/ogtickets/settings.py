@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'cart',
     'order',
     'payment',
+    'tickets',
 ]
 """List of installed applications."""
 
