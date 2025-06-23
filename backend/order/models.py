@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.db import transaction
 
 class Order(models.Model):
   STATUS_CHOICES = [
@@ -33,6 +34,21 @@ class Order(models.Model):
     self.status = 'paid'
     self.paid_at = timezone.now()
     self.save(update_fields=['status', 'paid_at'])
+    self.generate_tickets()
+
+  def generate_tickets(self):
+    """Create tickets for each order item."""
+    from tickets.models import Ticket
+    with transaction.atomic():
+      for item in self.items.all():
+        for i in range(item.quantity): # create a ticket for each quantity
+          Ticket.objects.create(
+            user=self.user,
+            order_item=item,
+            olympic_event=item.olympic_event,
+            nb_place=item.offer.nb_place,
+            status='valid',
+          )
 
 class OrderItem(models.Model):
   order = models.ForeignKey(

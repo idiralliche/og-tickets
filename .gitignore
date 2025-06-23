@@ -42,3 +42,4 @@ coverage/
 backup/
 
 worker/
+stripe

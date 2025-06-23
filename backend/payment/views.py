@@ -1,11 +1,11 @@
 import stripe
 from django.conf import settings
+from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.views.decorators.csrf import csrf_exempt
-from django.utils import timezone
 from order.models import Order
 
 @api_view(['POST'])
@@ -59,8 +59,7 @@ def stripe_webhook(request):
         user_id = intent['metadata'].get('user_id')
         order = Order.objects.filter(user_id=user_id, status='pending').order_by('-created_at').first()
         if order:
-            order.status = 'paid'
-            order.paid_at = timezone.now()
-            order.save(update_fields=['status', 'paid_at'])
+            with transaction.atomic():
+                order.mark_as_paid()
 
     return Response(status=200)
