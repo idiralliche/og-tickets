@@ -1,0 +1,60 @@
+@use 'mixins';
+@use 'variables';
+
+.summary-page {
+  @include mixins.list-page;
+
+  .summary-container {
+    @include mixins.flex-column;
+    margin: 0 auto;
+    max-width: 500px;
+    width: 90%;
+    border-radius: 5px;
+    border: variables.$border-light;
+    background-color: variables.$background-light;
+    color: variables.$text-dark;
+    margin-top: 20px;
+  }
+
+  .list-item {
+    @include mixins.flex-column;
+    background-color: variables.$background-light;
+    padding: 20px;
+    width: 90%;
+    border-radius: 5px;
+
+    h3,
+    h2 {
+      text-align: center;
+      width: 100%;
+      font-size: 1.2rem;
+      color: variables.$purple-dark;
+    }
+
+    .status {
+      font-weight: bold;
+
+      &.valid {
+        color: #4caf50;
+      }
+      &.invalid {
+        color: variables.$red;
+      }
+    }
+
+    .button {
+      margin-top: 20px;
+    }
+
+    .qr-code-container {
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .instructions {
+      font-size: 12px;
+      color: #999;
+      margin-top: 20px;
+    }
+  }
+}

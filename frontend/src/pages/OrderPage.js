@@ -26,7 +26,11 @@ export default function OrderPage() {
   };
 
   return (
-    <Layout title='Validation de la commande' subtitle={subtitles[step]}>
+    <Layout
+      title='Validation de la commande'
+      subtitle={subtitles[step]}
+      mainClassName={step !== 'payment' && 'summary-page'}
+    >
       {step === 'summary' && (
         <OrderSummary onValidate={handleSummaryValidate} />
       )}
