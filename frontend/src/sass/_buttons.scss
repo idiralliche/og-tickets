@@ -52,6 +52,10 @@ a.button {
   .button {
     @include mixins.button-styles(variables.$red, variables.$red-dark);
     padding: 1rem 2rem;
+
+    &.cta {
+      @include mixins.button-styles(variables.$gold, variables.$gold-dark);
+    }
   }
 }
 

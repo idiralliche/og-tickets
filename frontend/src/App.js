@@ -5,6 +5,7 @@ import OlympicEventsPage from './pages/OlympicEventsPage';
 import CartPage from './pages/CartPage';
 import OrderPage from './pages/OrderPage';
 import AccountPage from './pages/AccountPage';
+import TicketPage from './pages/TicketPage';
 import ActivationPage from './pages/ActivationPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage';
@@ -65,6 +66,14 @@ const App = () => {
         element={
           <MemberOnly redirectTo='/acces'>
             <OrderPage />
+          </MemberOnly>
+        }
+      />
+      <Route
+        path='/Tickets/:id'
+        element={
+          <MemberOnly redirectTo='/acces'>
+            <TicketPage />
           </MemberOnly>
         }
       />

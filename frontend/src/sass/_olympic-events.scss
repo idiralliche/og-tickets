@@ -2,10 +2,7 @@
 @use 'variables';
 
 .olympic-events {
-  @include mixins.flex-column;
-  padding: 10px;
-  margin: 0 auto;
-  max-width: 90%;
+  @include mixins.list-page;
 
   .container {
     @include mixins.flex-column;
@@ -66,9 +63,7 @@
 }
 
 .olympic-event-accordion {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+  @include mixins.flexbox-basics(column, space-around);
   width: 90%;
   margin-top: 10px;
   height: 100%;

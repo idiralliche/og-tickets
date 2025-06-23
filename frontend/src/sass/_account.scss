@@ -2,10 +2,7 @@
 @use 'variables';
 
 .account-page {
-  @include mixins.flex-column;
-  padding: 10px;
-  margin: 0 auto;
-  max-width: 90%;
+  @include mixins.list-page;
 
   .auth-container {
     width: 300px;

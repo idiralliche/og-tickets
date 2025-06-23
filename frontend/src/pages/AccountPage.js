@@ -4,6 +4,7 @@ import Login from '../components/Login';
 import Register from '../components/Register';
 import Layout from '../components/layout/Layout';
 import LoadingSpinner from '../components/LoadingSpinner.js';
+import TicketsList from '../components/TicketsList';
 
 /**
  * Account management page that handles:
@@ -48,21 +49,14 @@ const AccountPage = () => {
       <Layout
         title='Mon compte'
         subtitle='Gérez vos informations personnelles'
-        mainClassName='account-page'
+        mainClassName='summary-page'
       >
-        <p>Pour le moment, cette page est vide.</p>
-
-        <button
-          className='button'
-          style={{
-            margin: '2rem auto 4rem',
-            display: 'block',
-            color: '#ffffff',
-          }}
-          onClick={logout}
-        >
-          Déconnexion
-        </button>
+        <TicketsList />
+        <div className='view-all'>
+          <button className='button' onClick={logout}>
+            Déconnexion
+          </button>
+        </div>
       </Layout>
     );
   }

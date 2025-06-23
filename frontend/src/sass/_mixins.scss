@@ -26,6 +26,13 @@
   @include flexbox-basics();
 }
 
+@mixin list-page {
+  @include flex-column;
+  padding: 10px;
+  margin: 0 auto;
+  max-width: 90%;
+}
+
 // Mixin for square blocks
 @mixin square($value) {
   width: $value;
