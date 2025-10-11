@@ -1,7 +1,7 @@
 # 🎟️ OG-Tickets – Billetterie en ligne sécurisée (JO Paris 2024)
 
-[![CI Backend](https://github.com/ya-web/og-tickets/actions/workflows/ci.yml/badge.svg)](https://github.com/ya-web/og-tickets/actions/workflows/ci.yml)
-[![CD Backend](https://github.com/ya-web/og-tickets/actions/workflows/cd.yml/badge.svg)](https://github.com/ya-web/og-tickets/actions/workflows/cd.yml)
+[![CI Backend](https://github.com/idiralliche/og-tickets/actions/workflows/ci.yml/badge.svg)](https://github.com/idiralliche/og-tickets/actions/workflows/ci.yml)
+[![CD Backend](https://github.com/idiralliche/og-tickets/actions/workflows/cd.yml/badge.svg)](https://github.com/idiralliche/og-tickets/actions/workflows/cd.yml)
 
 > **Site officiel :** [https://ogtickets.space](https://ogtickets.space)  
 > **Documentation technique complète :** [TECHNICAL_DOC.md](./TECHNICAL_DOC.md)
@@ -157,4 +157,4 @@ Les écrans ci-dessous illustrent les principales étapes de parcours utilisateu
 **Idir Alliche**  
 Concepteur & Développeur Full Stack (Projet DevSecOps – Python / Django / React)
 Montpellier, France  
-[LinkedIn](https://linkedin.com/in/idiralliche) • [GitHub](https://github.com/ya-web)
+[LinkedIn](https://linkedin.com/in/idiralliche) • [GitHub](https://github.com/idiralliche)
